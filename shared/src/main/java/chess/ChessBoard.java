@@ -12,7 +12,6 @@ public class ChessBoard {
     private ChessPiece[][] chessBoard = new ChessPiece[BOARDSIZE][BOARDSIZE];
 
     public ChessBoard() {
-        resetBoard();
     }
 
     /**

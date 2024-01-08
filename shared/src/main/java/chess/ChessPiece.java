@@ -57,8 +57,7 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         switch (getPieceType()) {
             case KING:
-                Collection<ChessMove> KingMoves = kingMoves(board, myPosition);
-                return KingMoves.isEmpty() ? null : KingMoves;
+                return kingMoves(board, myPosition);
                 //Check to see if it is empty collection or null
             case QUEEN:
             case BISHOP:
@@ -81,24 +80,115 @@ public class ChessPiece {
         //North (Subtract 1 from row)
         if (currentRow - 1 > 0) {
             ChessPosition newPosition = new ChessPosition(currentRow -1, currentCol);
-            ChessPiece currentPiece = board.getPiece(newPosition);
-            if (currentPiece.getPieceType() == null) {
-                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
-                validMoves.add(validMove);
-            } else {
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
                 if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
                     ChessMove validMove = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(validMove);
                 }
+            } catch(NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
             }
         }
         //NE
+        if (currentRow -1 > 0 && currentCol +1 < 9) {
+            ChessPosition newPosition = new ChessPosition(currentRow -1, currentCol+1);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            } catch(NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            }
+        }
         //East (Add 1 to column)
+        if (currentCol + 1 < 9) {
+            ChessPosition newPosition = new ChessPosition(currentRow, currentCol + 1);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            } catch(NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            }
+        }
         //SE
+        if (currentRow + 1 < 9 && currentCol + 1 < 9) {
+            ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol + 1);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            } catch(NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            }
+        }
         //South (Add 1 to row)
+        if (currentRow + 1 < 9) {
+            ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            } catch(NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            }
+        }
         //SW
+        if (currentRow + 1 < 9 && currentCol - 1 > 0) {
+            ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol - 1);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            } catch(NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            }
+        }
         //West (Subtract 1 from column)
+        if (currentCol - 1 > 0) {
+            ChessPosition newPosition = new ChessPosition(currentRow, currentCol - 1);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            } catch(NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            }
+        }
         //NW
+        if (currentRow -1 > 0 && currentCol - 1 > 0) {
+            ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol - 1);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            } catch(NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            }
+        }
 
 
         return validMoves;
