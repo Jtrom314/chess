@@ -82,7 +82,7 @@ public class ChessPiece {
         if (currentRow - 1 > 0) {
             ChessPosition newPosition = new ChessPosition(currentRow -1, currentCol);
             ChessPiece currentPiece = board.getPiece(newPosition);
-            if (currentPiece.getPieceType() == null) {
+            if (currentPiece == null) {
                 ChessMove validMove = new ChessMove(myPosition, newPosition, null);
                 validMoves.add(validMove);
             } else {
@@ -93,8 +93,47 @@ public class ChessPiece {
             }
         }
         //NE
+        if (currentRow -1 > 0 && currentCol +1 < 9) {
+            ChessPosition newPosition = new ChessPosition(currentRow -1, currentCol+1);
+            ChessPiece currentPiece = board.getPiece(newPosition);
+            if (currentPiece == null) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            } else {
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            }
+        }
         //East (Add 1 to column)
+        if (currentCol + 1 < 9) {
+            ChessPosition newPosition = new ChessPosition(currentRow, currentCol + 1);
+            ChessPiece currentPiece = board.getPiece(newPosition);
+            if (currentPiece == null) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            } else {
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            }
+        }
         //SE
+        if (currentRow + 1 < 9 && currentCol + 1 < 9) {
+            ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol + 1);
+            ChessPiece currentPiece = board.getPiece(newPosition);
+            if (currentPiece == null) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            } else {
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            }
+        }
         //South (Add 1 to row)
         //SW
         //West (Subtract 1 from column)
