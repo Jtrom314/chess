@@ -22,7 +22,10 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        int row = ChessPosition.
+        int row = position.getRow();
+        int col = position.getColumn();
+
+        this.chessBoard[BOARDSIZE - row][col - 1] = piece;
     }
 
     /**
@@ -33,7 +36,11 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        int row = position.getRow();
+        int col = position.getColumn();
+
+        ChessPiece currentPiece = this.chessBoard[BOARDSIZE - row][col - 1];
+        return currentPiece.getPieceType() == null ? null : currentPiece;
     }
 
     /**
@@ -57,9 +64,10 @@ public class ChessBoard {
     }
 
     public void printBoard() {
-        for (int i = BOARDSIZE; i >= 0; i--) {
-            System.out.printf("%d\t", i);
-            for (int j = BOARDSIZE; j >= 0; j--) {
+        for (int i = 0; i < BOARDSIZE; i++) {
+            int rowNumber = BOARDSIZE + 1 - i;
+            System.out.printf("%d\t", rowNumber);
+            for (int j = 0; j < BOARDSIZE; j++) {
                 System.out.printf("-\t");
             }
             System.out.printf("\n");

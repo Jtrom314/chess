@@ -30,4 +30,15 @@ public class ChessPosition {
     public int getColumn() {
         return this.col;
     }
+    /**
+     * 8    r   n   b   q   k   b   n   r
+     * 7    p   p   p   p   p   p   p   p
+     * 6    {black}
+     * 5
+     * 4
+     * 3    {white}
+     * 2    P   P   P   P   P   P   P   P
+     * 1    R   N   B   Q   K   B   N   R
+     *      1   2   3   4   5   6   7   8
+     */
 }
