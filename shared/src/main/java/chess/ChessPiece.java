@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Represents a single chess piece
@@ -9,7 +10,7 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
-
+    private int BOARDSIZE = 8;
     private ChessGame.TeamColor color = null;
     private ChessPiece.PieceType type = null;
     public ChessPiece() {
@@ -54,8 +55,59 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        switch (getPieceType()) {
+            case KING:
+                Collection<ChessMove> KingMoves = kingMoves(board, myPosition);
+                return KingMoves.isEmpty() ? null : KingMoves;
+                //Check to see if it is empty collection or null
+            case QUEEN:
+            case BISHOP:
+            case KNIGHT:
+            case ROOK:
+            case PAWN:
+                break;
+        }
+        return null;
     }
+
+    public Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
+        //Create an empty collection
+        Collection<ChessMove> validMoves = new HashSet<>();
+        ChessGame.TeamColor friendlyTeamColor = getTeamColor();
+        int currentRow = myPosition.getRow();
+        int currentCol = myPosition.getColumn();
+
+        //Check each of the possible directions King can move
+        //North (Subtract 1 from row)
+        if (currentRow - 1 > 0) {
+            ChessPosition newPosition = new ChessPosition(currentRow -1, currentCol);
+            ChessPiece currentPiece = board.getPiece(newPosition);
+            if (currentPiece.getPieceType() == null) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+            } else {
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+            }
+        }
+        //NE
+        //East (Add 1 to column)
+        //SE
+        //South (Add 1 to row)
+        //SW
+        //West (Subtract 1 from column)
+        //NW
+
+
+        return validMoves;
+    }
+//    public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {}
+//    public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {}
+//    public Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {}
+//    public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {}
+//    public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {}
 
     public String toString() {
         if (getTeamColor() == null || getPieceType() == null) {
