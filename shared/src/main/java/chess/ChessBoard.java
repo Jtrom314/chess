@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Arrays;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -8,7 +10,7 @@ package chess;
  */
 
 public class ChessBoard {
-    public int BOARDSIZE = 8;
+    public static final int BOARDSIZE = 8;
     private ChessPiece[][] chessBoard = new ChessPiece[BOARDSIZE][BOARDSIZE];
 
     public ChessBoard() {
@@ -38,8 +40,8 @@ public class ChessBoard {
         int row = position.getRow();
         int col = position.getColumn();
 
-        ChessPiece currentPiece = this.chessBoard[BOARDSIZE - row][col - 1];
-        return currentPiece.getPieceType() == null ? null : currentPiece;
+        return this.chessBoard[BOARDSIZE - row][col - 1];
+        // investigate just returning chesspiece
     }
 
     /**
@@ -50,12 +52,7 @@ public class ChessBoard {
         // Create an empty board
         this.chessBoard = new ChessPiece[BOARDSIZE][BOARDSIZE];
         // Fill board with pieces
-        for (int i = 0; i < BOARDSIZE; i++) {
-            for (int j = 0; j < BOARDSIZE; j++) {
-                ChessPiece blank = new ChessPiece();
-                this.chessBoard[i][j] = blank;
-            }
-        }
+
         // White
         // Rooks
         ChessPiece RookW1 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
@@ -155,24 +152,40 @@ public class ChessBoard {
 
     }
 
-    public void printBoard() {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.deepEquals(chessBoard, that.chessBoard);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(chessBoard);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder mystring = new StringBuilder();
         for (int i = 0; i < BOARDSIZE; i++) {
             int rowNumber = BOARDSIZE - i;
-            System.out.printf("%d\t", rowNumber);
+            mystring.append(i).append("\t");
             for (int j = 0; j < BOARDSIZE; j++) {
-                ChessPosition currentPosition = new ChessPosition(BOARDSIZE -i,j+1);
+                ChessPosition currentPosition = new ChessPosition(BOARDSIZE - i, j + 1);
                 ChessPiece currentChessPiece = getPiece(currentPosition);
                 if (currentChessPiece == null) {
-                    System.out.printf("-\t");
+                    mystring.append("-\t");
                 } else {
-                    System.out.printf("%s\t",currentChessPiece.toString());
+                    mystring.append(currentChessPiece.toString()).append("\t");
                 }
             }
-            System.out.printf("\n");
+            mystring.append("\n");
         }
-        System.out.printf("\t");
+        mystring.append("\t");
         for (int i = 1; i <= BOARDSIZE; i++) {
-            System.out.printf("%d\t", i);
+            mystring.append(i).append("\t");
         }
-    }
+        return mystring.toString();
+        }
 }
