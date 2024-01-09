@@ -339,7 +339,7 @@ public class ChessPiece {
         // 2 spaces left
         if (currentCol - 2 > 0) {
             // 1 space up
-            if (currentRow + 1 < 8) {
+            if (currentRow + 1 <= 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow +1, currentCol -2);
                 try {
                     ChessPiece currentPiece = board.getPiece(newPosition);
@@ -369,9 +369,9 @@ public class ChessPiece {
         }
 
         // 2 spaces right
-        if (currentCol + 2 < 8) {
+        if (currentCol + 2 <= 8) {
             // 1 space up
-            if (currentRow + 1 < 8) {
+            if (currentRow + 1 <= 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow +1, currentCol +2);
                 try {
                     ChessPiece currentPiece = board.getPiece(newPosition);
@@ -418,7 +418,7 @@ public class ChessPiece {
             }
 
             // 1 space right
-            if (currentCol + 1 < 8) {
+            if (currentCol + 1 <= 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow - 2, currentCol +1);
                 try {
                     ChessPiece currentPiece = board.getPiece(newPosition);
