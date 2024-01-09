@@ -60,6 +60,7 @@ public class ChessPiece {
                 return kingMoves(board, myPosition);
             case QUEEN:
             case BISHOP:
+                return bishopMoves(board, myPosition);
             case KNIGHT:
             case ROOK:
                 return rookMoves(board, myPosition);
@@ -194,7 +195,104 @@ public class ChessPiece {
         return validMoves;
     }
 //    public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {}
-//    public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {}
+    public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+        // Create an empty collection
+        Collection<ChessMove> validMoves = new HashSet<>();
+        ChessGame.TeamColor friendlyTeamColor = getTeamColor();
+        int currentRow = myPosition.getRow();
+        int currentCol = myPosition.getColumn();
+
+        int iterator = 1;
+
+        // Check to see what moves the bishop can make
+        // NW
+        while(true) {
+            if (currentRow + iterator > 8 || currentCol - iterator == 0) {
+                break;
+            }
+            ChessPosition newPosition = new ChessPosition(currentRow + iterator, currentCol - iterator);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+                break;
+            } catch (NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+                iterator++;
+            }
+        }
+
+
+        iterator = 1;
+        // SW
+        while(true) {
+            if (currentRow - iterator == 0 || currentCol - iterator == 0) {
+                break;
+            }
+            ChessPosition newPosition = new ChessPosition(currentRow - iterator, currentCol - iterator);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+                break;
+            } catch (NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+                iterator++;
+            }
+        }
+
+
+        iterator = 1;
+        // NE
+        while(true) {
+            if (currentRow + iterator > 8 || currentCol + iterator > 8) {
+                break;
+            }
+            ChessPosition newPosition = new ChessPosition(currentRow + iterator, currentCol + iterator);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+                break;
+            } catch (NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+                iterator++;
+            }
+        }
+
+
+        iterator = 1;
+        // SE
+        while(true) {
+            if (currentRow - iterator == 0 || currentCol + iterator > 8) {
+                break;
+            }
+            ChessPosition newPosition = new ChessPosition(currentRow - iterator, currentCol + iterator);
+            try {
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                    validMoves.add(validMove);
+                }
+                break;
+            } catch (NullPointerException e) {
+                ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                validMoves.add(validMove);
+                iterator++;
+            }
+        }
+
+        return validMoves;
+    }
 //    public Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {}
     public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
         // Create an empty collection
