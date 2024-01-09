@@ -12,7 +12,7 @@ import static passoffTests.TestFactory.*;
 public class PawnMoveTests {
 
     @Test
-    public void pawnMiddleOfBoardWhite() {
+    public void pawnMiddleOfBoardWhite() { // Pass
         validateMoves("""
                         | | | | | | | | |
                         | | | | | | | | |
@@ -47,7 +47,7 @@ public class PawnMoveTests {
 
 
     @Test
-    public void pawnInitialMoveWhite() {
+    public void pawnInitialMoveWhite() { // Pass
         validateMoves("""
                         | | | | | | | | |
                         | | | | | | | | |
@@ -82,7 +82,7 @@ public class PawnMoveTests {
 
 
     @Test
-    public void pawnPromotionWhite() {
+    public void pawnPromotionWhite() { // Pass
         validatePromotion("""
                         | | | | | | | | |
                         | | |P| | | | | |
@@ -136,7 +136,7 @@ public class PawnMoveTests {
 
 
     @Test
-    public void pawnAdvanceBlockedWhite() {
+    public void pawnAdvanceBlockedWhite() { // Pass
         validateMoves("""
                         | | | | | | | | |
                         | | | | | | | | |
@@ -171,7 +171,7 @@ public class PawnMoveTests {
 
 
     @Test
-    public void pawnAdvanceBlockedDoubleMoveWhite() {
+    public void pawnAdvanceBlockedDoubleMoveWhite() { // Pass
         validateMoves("""
                         | | | | | | | | |
                         | | | | | | | | |
@@ -206,7 +206,7 @@ public class PawnMoveTests {
 
 
     @Test
-    public void pawnCaptureWhite() {
+    public void pawnCaptureWhite() { // Pass
         validateMoves("""
                         | | | | | | | | |
                         | | | | | | | | |
