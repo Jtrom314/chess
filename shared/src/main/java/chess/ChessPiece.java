@@ -212,7 +212,6 @@ public class ChessPiece {
 
         return validMoves;
     }
-//    public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {}
     public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
         // Create an empty collection
         Collection<ChessMove> validMoves = new HashSet<>();
@@ -553,174 +552,159 @@ public class ChessPiece {
         int currentRow = myPosition.getRow();
         int currentCol = myPosition.getColumn();
 
-
         if (friendlyTeamColor == ChessGame.TeamColor.WHITE) {
-            boolean isFirstMove = currentRow == 2 ? true : false;
-            boolean blocked = true;
+            boolean firstMove = currentRow == 2;
 
-            // Check one space in front (Can only advance if there isn't a piece in front of it)
-            ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
-            try {
-                ChessPiece currentPiece = board.getPiece(newPosition);
-            } catch (NullPointerException e) {
-                if (currentRow + 1 == 8) {
-                    ChessMove validMove1 = new ChessMove(myPosition, newPosition, PieceType.BISHOP);
-                    ChessMove validMove2 = new ChessMove(myPosition, newPosition, PieceType.ROOK);
-                    ChessMove validMove3 = new ChessMove(myPosition, newPosition, PieceType.KNIGHT);
-                    ChessMove validMove4 = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
-                    validMoves.add(validMove1);
-                    validMoves.add(validMove2);
-                    validMoves.add(validMove3);
-                    validMoves.add(validMove4);
-                } else {
-                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
-                    validMoves.add(validMove);
-                    blocked = false;
+            // Moving one forward
+            if (currentRow + 1 <= 8) {
+                ChessPosition advanceOneForward = new ChessPosition(currentRow + 1, currentCol);
+                ChessPiece currentPiece = board.getPiece(advanceOneForward);
+                if (currentPiece == null) {
+                    if (currentRow + 1 == 8) {
+                        // Promotion
+                        ChessMove validMove1 = new ChessMove(myPosition, advanceOneForward, PieceType.QUEEN);
+                        ChessMove validMove2 = new ChessMove(myPosition, advanceOneForward, PieceType.ROOK);
+                        ChessMove validMove3 = new ChessMove(myPosition, advanceOneForward, PieceType.BISHOP);
+                        ChessMove validMove4 = new ChessMove(myPosition, advanceOneForward, PieceType.KNIGHT);
+                        validMoves.add(validMove1);
+                        validMoves.add(validMove2);
+                        validMoves.add(validMove3);
+                        validMoves.add(validMove4);
+                    } else {
+                        ChessMove validMove = new ChessMove(myPosition, advanceOneForward, null);
+                        validMoves.add(validMove);
+                        if (firstMove) {
+                            ChessPosition advanceTwoForward = new ChessPosition(currentRow + 2, currentCol);
+                            currentPiece = board.getPiece(advanceTwoForward);
+                            if (currentPiece == null) {
+                                validMove = new ChessMove(myPosition, advanceTwoForward, null);
+                                validMoves.add(validMove);
+                            }
+                        }
+                    }
                 }
             }
-            if (isFirstMove && !blocked) {
-                newPosition = new ChessPosition(currentRow + 2, currentCol);
-                try {
+
+            // Capturing one to the side
+            if (currentRow + 1 <= 8) {
+                if (currentCol + 1 <= 8) {
+                    ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol + 1);
                     ChessPiece currentPiece = board.getPiece(newPosition);
-                } catch (NullPointerException e) {
-                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
-                    validMoves.add(validMove);
-                }
-            }
-
-            // Check one space in front and to each side
-            if (currentCol - 1 > 0) {
-                ChessPosition takePosition = new ChessPosition(currentRow + 1, currentCol -1);
-                try {
-                    ChessPiece currentPiece = board.getPiece(takePosition);
-                    if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
+                    if (currentPiece != null && currentPiece.getPieceType() != PieceType.KING && currentPiece.getTeamColor() != friendlyTeamColor) {
                         if (currentRow + 1 == 8) {
-                            ChessMove validMove1 = new ChessMove(myPosition, takePosition, PieceType.BISHOP);
-                            ChessMove validMove2 = new ChessMove(myPosition, takePosition, PieceType.ROOK);
-                            ChessMove validMove3 = new ChessMove(myPosition, takePosition, PieceType.KNIGHT);
-                            ChessMove validMove4 = new ChessMove(myPosition, takePosition, PieceType.QUEEN);
+                            ChessMove validMove1 = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
+                            ChessMove validMove2 = new ChessMove(myPosition, newPosition, PieceType.ROOK);
+                            ChessMove validMove3 = new ChessMove(myPosition, newPosition, PieceType.BISHOP);
+                            ChessMove validMove4 = new ChessMove(myPosition, newPosition, PieceType.KNIGHT);
                             validMoves.add(validMove1);
                             validMoves.add(validMove2);
                             validMoves.add(validMove3);
                             validMoves.add(validMove4);
                         } else {
-                            ChessMove validMove = new ChessMove(myPosition, takePosition, null);
+                            ChessMove validMove = new ChessMove(myPosition, newPosition, null);
                             validMoves.add(validMove);
                         }
                     }
-                } catch (NullPointerException e) {
-                    // Do nothing
                 }
-            }
 
-            if (currentCol + 1 < 8) {
-                ChessPosition takePosition = new ChessPosition(currentRow +1, currentCol +1);
-                try {
-                    ChessPiece currentPiece = board.getPiece(takePosition);
-                    if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
-                        if (currentRow + 1 == 8) {
-                            ChessMove validMove1 = new ChessMove(myPosition, takePosition, PieceType.BISHOP);
-                            ChessMove validMove2 = new ChessMove(myPosition, takePosition, PieceType.ROOK);
-                            ChessMove validMove3 = new ChessMove(myPosition, takePosition, PieceType.KNIGHT);
-                            ChessMove validMove4 = new ChessMove(myPosition, takePosition, PieceType.QUEEN);
-                            validMoves.add(validMove1);
-                            validMoves.add(validMove2);
-                            validMoves.add(validMove3);
-                            validMoves.add(validMove4);
-                        } else {
-                            ChessMove validMove = new ChessMove(myPosition, takePosition, null);
-                            validMoves.add(validMove);
-                        }
-                    }
-                } catch (NullPointerException e) {
-                    // Do nothing
-                }
-            }
-
-
-        } else {  // Black
-            boolean isFirstMove = currentRow == 7 ? true : false;
-            boolean blocked = true;
-
-            // Check one space in front (Can only advance if there isn't a piece in front of it)
-            ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol);
-            try {
-                ChessPiece currentPiece = board.getPiece(newPosition);
-            } catch (NullPointerException e) {
-                if (currentRow - 1 == 1) {
-                    ChessMove validMove1 = new ChessMove(myPosition, newPosition, PieceType.BISHOP);
-                    ChessMove validMove2 = new ChessMove(myPosition, newPosition, PieceType.ROOK);
-                    ChessMove validMove3 = new ChessMove(myPosition, newPosition, PieceType.KNIGHT);
-                    ChessMove validMove4 = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
-                    validMoves.add(validMove1);
-                    validMoves.add(validMove2);
-                    validMoves.add(validMove3);
-                    validMoves.add(validMove4);
-                } else {
-                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
-                    validMoves.add(validMove);
-                    blocked = false;
-                }
-            }
-            if (isFirstMove && !blocked) {
-                newPosition = new ChessPosition(currentRow - 2, currentCol);
-                try {
+                if (currentCol - 1 >= 0) {
+                    ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol - 1);
                     ChessPiece currentPiece = board.getPiece(newPosition);
-                } catch (NullPointerException e) {
-                    ChessMove validMove = new ChessMove(myPosition, newPosition, null);
-                    validMoves.add(validMove);
-                }
-            }
-
-            // Check one space in front and to each side
-            if (currentCol - 1 > 0) {
-                ChessPosition takePosition = new ChessPosition(currentRow - 1, currentCol -1);
-                try {
-                    ChessPiece currentPiece = board.getPiece(takePosition);
-                    if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
-                        if (currentRow - 1 == 1) {
-                            ChessMove validMove1 = new ChessMove(myPosition, takePosition, PieceType.BISHOP);
-                            ChessMove validMove2 = new ChessMove(myPosition, takePosition, PieceType.ROOK);
-                            ChessMove validMove3 = new ChessMove(myPosition, takePosition, PieceType.KNIGHT);
-                            ChessMove validMove4 = new ChessMove(myPosition, takePosition, PieceType.QUEEN);
+                    if (currentPiece != null && currentPiece.getPieceType() != PieceType.KING && currentPiece.getTeamColor() != friendlyTeamColor) {
+                        if (currentRow + 1 == 8) {
+                            ChessMove validMove1 = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
+                            ChessMove validMove2 = new ChessMove(myPosition, newPosition, PieceType.ROOK);
+                            ChessMove validMove3 = new ChessMove(myPosition, newPosition, PieceType.BISHOP);
+                            ChessMove validMove4 = new ChessMove(myPosition, newPosition, PieceType.KNIGHT);
                             validMoves.add(validMove1);
                             validMoves.add(validMove2);
                             validMoves.add(validMove3);
                             validMoves.add(validMove4);
                         } else {
-                            ChessMove validMove = new ChessMove(myPosition, takePosition, null);
+                            ChessMove validMove = new ChessMove(myPosition, newPosition, null);
                             validMoves.add(validMove);
                         }
                     }
-                } catch (NullPointerException e) {
-                    // Do nothing
+                }
+            }
+        } else { // Black
+            boolean firstMove = currentRow == 7;
+
+            // Moving one forward
+            if (currentRow - 1 >= 0) {
+                ChessPosition advanceOneForward = new ChessPosition(currentRow - 1, currentCol);
+                ChessPiece currentPiece = board.getPiece(advanceOneForward);
+                if (currentPiece == null) {
+                    if (currentRow - 1 == 1) {
+                        // Promotion
+                        ChessMove validMove1 = new ChessMove(myPosition, advanceOneForward, PieceType.QUEEN);
+                        ChessMove validMove2 = new ChessMove(myPosition, advanceOneForward, PieceType.ROOK);
+                        ChessMove validMove3 = new ChessMove(myPosition, advanceOneForward, PieceType.BISHOP);
+                        ChessMove validMove4 = new ChessMove(myPosition, advanceOneForward, PieceType.KNIGHT);
+                        validMoves.add(validMove1);
+                        validMoves.add(validMove2);
+                        validMoves.add(validMove3);
+                        validMoves.add(validMove4);
+                    } else {
+                        ChessMove validMove = new ChessMove(myPosition, advanceOneForward, null);
+                        validMoves.add(validMove);
+                        if (firstMove) {
+                            ChessPosition advanceTwoForward = new ChessPosition(currentRow - 2, currentCol);
+                            currentPiece = board.getPiece(advanceTwoForward);
+                            if (currentPiece == null) {
+                                validMove = new ChessMove(myPosition, advanceTwoForward, null);
+                                validMoves.add(validMove);
+                            }
+                        }
+                    }
                 }
             }
 
-            if (currentCol + 1 < 8) {
-                ChessPosition takePosition = new ChessPosition(currentRow -1, currentCol +1);
-                try {
-                    ChessPiece currentPiece = board.getPiece(takePosition);
-                    if (currentPiece.getTeamColor() != friendlyTeamColor && currentPiece.getPieceType() != PieceType.KING) {
-                        if (currentRow - 1 == 1) {
-                            ChessMove validMove1 = new ChessMove(myPosition, takePosition, PieceType.BISHOP);
-                            ChessMove validMove2 = new ChessMove(myPosition, takePosition, PieceType.ROOK);
-                            ChessMove validMove3 = new ChessMove(myPosition, takePosition, PieceType.KNIGHT);
-                            ChessMove validMove4 = new ChessMove(myPosition, takePosition, PieceType.QUEEN);
-                            validMoves.add(validMove1);
-                            validMoves.add(validMove2);
-                            validMoves.add(validMove3);
-                            validMoves.add(validMove4);
-                        } else {
-                            ChessMove validMove = new ChessMove(myPosition, takePosition, null);
-                            validMoves.add(validMove);
-                        }
+        }
+
+        // Capturing one to the side
+        if (currentRow - 1 >= 0) {
+            if (currentCol + 1 <= 8) {
+                ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol + 1);
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece != null && currentPiece.getPieceType() != PieceType.KING && currentPiece.getTeamColor() != friendlyTeamColor) {
+                    if (currentRow - 1 == 1) {
+                        ChessMove validMove1 = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
+                        ChessMove validMove2 = new ChessMove(myPosition, newPosition, PieceType.ROOK);
+                        ChessMove validMove3 = new ChessMove(myPosition, newPosition, PieceType.BISHOP);
+                        ChessMove validMove4 = new ChessMove(myPosition, newPosition, PieceType.KNIGHT);
+                        validMoves.add(validMove1);
+                        validMoves.add(validMove2);
+                        validMoves.add(validMove3);
+                        validMoves.add(validMove4);
+                    } else {
+                        ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                        validMoves.add(validMove);
                     }
-                } catch (NullPointerException e) {
-                    // Do nothing
+                }
+            }
+
+            if (currentCol - 1 >= 0) {
+                ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol - 1);
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                if (currentPiece != null && currentPiece.getPieceType() != PieceType.KING && currentPiece.getTeamColor() != friendlyTeamColor) {
+                    if (currentRow - 1 == 1) {
+                        ChessMove validMove1 = new ChessMove(myPosition, newPosition, PieceType.QUEEN);
+                        ChessMove validMove2 = new ChessMove(myPosition, newPosition, PieceType.ROOK);
+                        ChessMove validMove3 = new ChessMove(myPosition, newPosition, PieceType.BISHOP);
+                        ChessMove validMove4 = new ChessMove(myPosition, newPosition, PieceType.KNIGHT);
+                        validMoves.add(validMove1);
+                        validMoves.add(validMove2);
+                        validMoves.add(validMove3);
+                        validMoves.add(validMove4);
+                    } else {
+                        ChessMove validMove = new ChessMove(myPosition, newPosition, null);
+                        validMoves.add(validMove);
+                    }
                 }
             }
         }
+
         return validMoves;
     }
 

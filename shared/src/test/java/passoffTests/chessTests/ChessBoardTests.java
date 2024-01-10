@@ -27,7 +27,7 @@ public class ChessBoardTests {
 
     @Test
     @DisplayName("Reset Board")
-    public void defaultGameBoard() {
+    public void defaultGameBoard() { // Not passing
         var expectedBoard = loadBoard("""
                 |r|n|b|q|k|b|n|r|
                 |p|p|p|p|p|p|p|p|

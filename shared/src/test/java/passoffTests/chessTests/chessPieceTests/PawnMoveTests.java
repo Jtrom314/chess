@@ -29,7 +29,7 @@ public class PawnMoveTests {
     }
 
     @Test
-    public void pawnMiddleOfBoardBlack() {
+    public void pawnMiddleOfBoardBlack() { // Pass
         validateMoves("""
                         | | | | | | | | |
                         | | | | | | | | |
@@ -64,7 +64,7 @@ public class PawnMoveTests {
     }
 
     @Test
-    public void pawnInitialMoveBlack() {
+    public void pawnInitialMoveBlack() { // Pass
         validateMoves("""
                         | | | | | | | | |
                         | | |p| | | | | |
@@ -100,7 +100,7 @@ public class PawnMoveTests {
 
 
     @Test
-    public void edgePromotionBlack() {
+    public void edgePromotionBlack() { // Pass
         validatePromotion("""
                         | | | | | | | | |
                         | | | | | | | | |
@@ -118,7 +118,7 @@ public class PawnMoveTests {
 
 
     @Test
-    public void pawnPromotionCapture() {
+    public void pawnPromotionCapture() { // Pass
         validatePromotion("""
                         | | | | | | | | |
                         | | | | | | | | |
@@ -153,7 +153,7 @@ public class PawnMoveTests {
     }
 
     @Test
-    public void pawnAdvanceBlockedBlack() {
+    public void pawnAdvanceBlockedBlack() { // Pass
         validateMoves("""
                         | | | | | | | | |
                         | | | | | | | | |
@@ -188,7 +188,7 @@ public class PawnMoveTests {
     }
 
     @Test
-    public void pawnAdvanceBlockedDoubleMoveBlack() {
+    public void pawnAdvanceBlockedDoubleMoveBlack() { // Pass
         validateMoves("""
                         | | | | | | | | |
                         | | |p| | | | | |

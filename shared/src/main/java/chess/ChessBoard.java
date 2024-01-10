@@ -41,7 +41,6 @@ public class ChessBoard {
         int col = position.getColumn();
 
         return this.chessBoard[BOARDSIZE - row][col - 1];
-        // investigate just returning chesspiece
     }
 
     /**
@@ -187,5 +186,5 @@ public class ChessBoard {
             mystring.append(i).append("\t");
         }
         return mystring.toString();
-        }
+    }
 }
