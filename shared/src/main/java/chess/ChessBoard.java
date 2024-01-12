@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -8,12 +9,13 @@ import java.util.Arrays;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-
 public class ChessBoard {
-    public static final int BOARDSIZE = 8;
-    private ChessPiece[][] chessBoard = new ChessPiece[BOARDSIZE][BOARDSIZE];
+
+    int BOARDSIZE = 8;
+    ChessPiece[][] chessboard = new ChessPiece[BOARDSIZE][BOARDSIZE];
 
     public ChessBoard() {
+
     }
 
     /**
@@ -26,7 +28,7 @@ public class ChessBoard {
         int row = position.getRow();
         int col = position.getColumn();
 
-        this.chessBoard[BOARDSIZE - row][col - 1] = piece;
+        this.chessboard[BOARDSIZE - row][col - 1] = piece;
     }
 
     /**
@@ -40,7 +42,7 @@ public class ChessBoard {
         int row = position.getRow();
         int col = position.getColumn();
 
-        return this.chessBoard[BOARDSIZE - row][col - 1];
+        return this.chessboard[BOARDSIZE - row][col - 1];
     }
 
     /**
@@ -48,107 +50,77 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        // Create an empty board
-        this.chessBoard = new ChessPiece[BOARDSIZE][BOARDSIZE];
-        // Fill board with pieces
+        this.chessboard = new ChessPiece[BOARDSIZE][BOARDSIZE];
 
-        // White
-        // Rooks
-        ChessPiece RookW1 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
-        ChessPiece RookW2 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        // WHITE
+        ChessPosition RW1 = new ChessPosition(1, 1);
+        ChessPosition RW2 = new ChessPosition(1, 8);
+        ChessPiece RKW1 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        ChessPiece RKW2 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        addPiece(RW1, RKW1);
+        addPiece(RW2, RKW2);
 
-        ChessPosition RW1 = new ChessPosition(1,1);
-        ChessPosition RW2 = new ChessPosition(1,8);
+        ChessPosition NW1 = new ChessPosition(1, 2);
+        ChessPosition NW2 = new ChessPosition(1, 7);
+        ChessPiece KNW1 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        ChessPiece KNW2 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        addPiece(NW1, KNW1);
+        addPiece(NW2, KNW2);
 
-        addPiece(RW1, RookW1);
-        addPiece(RW2, RookW2);
-
-        // Knights
-        ChessPiece KnightW1 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
-        ChessPiece KnightW2 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
-
-        ChessPosition KW1 = new ChessPosition(1,2);
-        ChessPosition KW2 = new ChessPosition(1, 7);
-
-        addPiece(KW1, KnightW1);
-        addPiece(KW2, KnightW2);
-
-        // Bishops
-        ChessPiece BishopW1 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
-        ChessPiece BishopW2 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
-
-        ChessPosition BW1 = new ChessPosition(1,3);
-        ChessPosition BW2 = new ChessPosition(1,6);
-
-        addPiece(BW1, BishopW1);
-        addPiece(BW2, BishopW2);
-
-        // Royals
-        ChessPiece KingW = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
-        ChessPiece QueenW = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        ChessPosition BW1 = new ChessPosition(1, 3);
+        ChessPosition BW2 = new ChessPosition(1, 6);
+        ChessPiece BIW1 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        ChessPiece BIW2 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        addPiece(BW1, BIW1);
+        addPiece(BW2, BIW2);
 
         ChessPosition KW = new ChessPosition(1, 5);
         ChessPosition QW = new ChessPosition(1, 4);
+        ChessPiece KIW = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        ChessPiece QUW = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        addPiece(KW, KIW);
+        addPiece(QW, QUW);
 
-        addPiece(KW, KingW);
-        addPiece(QW, QueenW);
-
-        // Pawns
         for (int i = 0; i < BOARDSIZE; i++) {
+            ChessPosition pawn_pos = new ChessPosition(2, i+1);
             ChessPiece pawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            ChessPosition position = new ChessPosition(2, i+1);
-            addPiece(position, pawn);
+            addPiece(pawn_pos, pawn);
         }
 
-        // Black
-        // Rooks
-        ChessPiece RookB1 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
-        ChessPiece RookB2 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        // BLACK
+        ChessPosition RB1 = new ChessPosition(8, 1);
+        ChessPosition RB2 = new ChessPosition(8, 8);
+        ChessPiece RKB1 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        ChessPiece RKB2 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        addPiece(RB1, RKB1);
+        addPiece(RB2, RKB2);
 
-        ChessPosition RB1 = new ChessPosition(8,1);
-        ChessPosition RB2 = new ChessPosition(8,8);
+        ChessPosition NB1 = new ChessPosition(8, 2);
+        ChessPosition NB2 = new ChessPosition(8, 7);
+        ChessPiece KNB1 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        ChessPiece KNB2 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        addPiece(NB1, KNB1);
+        addPiece(NB2, KNB2);
 
-        addPiece(RB1, RookB1);
-        addPiece(RB2, RookB2);
-
-        // Knights
-        ChessPiece KnightB1 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
-        ChessPiece KnightB2 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
-
-        ChessPosition KB1 = new ChessPosition(8,2);
-        ChessPosition KB2 = new ChessPosition(8, 7);
-
-        addPiece(KB1, KnightB1);
-        addPiece(KB2, KnightB2);
-
-        // Bishops
-        ChessPiece BishopB1 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
-        ChessPiece BishopB2 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
-
-        ChessPosition BB1 = new ChessPosition(8,3);
-        ChessPosition BB2 = new ChessPosition(8,6);
-
-        addPiece(BB1, BishopB1);
-        addPiece(BB2, BishopB2);
-
-        // Royals
-        ChessPiece KingB = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
-        ChessPiece QueenB = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+        ChessPosition BB1 = new ChessPosition(8, 3);
+        ChessPosition BB2 = new ChessPosition(8, 6);
+        ChessPiece BIB1 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        ChessPiece BIB2 = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        addPiece(BB1, BIB1);
+        addPiece(BB2, BIB2);
 
         ChessPosition KB = new ChessPosition(8, 5);
         ChessPosition QB = new ChessPosition(8, 4);
+        ChessPiece KIB = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+        ChessPiece QUB = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+        addPiece(KB, KIB);
+        addPiece(QB, QUB);
 
-        addPiece(KB, KingB);
-        addPiece(QB, QueenB);
-
-        // Pawns
         for (int i = 0; i < BOARDSIZE; i++) {
+            ChessPosition pawn_pos = new ChessPosition(7, i+1);
             ChessPiece pawn = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            ChessPosition position = new ChessPosition(7, i+1);
-            addPiece(position, pawn);
+            addPiece(pawn_pos, pawn);
         }
-
-
     }
 
     @Override
@@ -156,35 +128,13 @@ public class ChessBoard {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-        return Arrays.deepEquals(chessBoard, that.chessBoard);
+        return BOARDSIZE == that.BOARDSIZE && Arrays.deepEquals(chessboard, that.chessboard);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(chessBoard);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder mystring = new StringBuilder();
-        for (int i = 0; i < BOARDSIZE; i++) {
-            int rowNumber = BOARDSIZE - i;
-            mystring.append(i).append("\t");
-            for (int j = 0; j < BOARDSIZE; j++) {
-                ChessPosition currentPosition = new ChessPosition(BOARDSIZE - i, j + 1);
-                ChessPiece currentChessPiece = getPiece(currentPosition);
-                if (currentChessPiece == null) {
-                    mystring.append("-\t");
-                } else {
-                    mystring.append(currentChessPiece.toString()).append("\t");
-                }
-            }
-            mystring.append("\n");
-        }
-        mystring.append("\t");
-        for (int i = 1; i <= BOARDSIZE; i++) {
-            mystring.append(i).append("\t");
-        }
-        return mystring.toString();
+        int result = Objects.hash(BOARDSIZE);
+        result = 31 * result + Arrays.deepHashCode(chessboard);
+        return result;
     }
 }

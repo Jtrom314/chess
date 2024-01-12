@@ -9,22 +9,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPosition {
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessPosition position = (ChessPosition) o;
-        return row == position.row && col == position.col;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(row, col);
-    }
-
     private int row;
     private int col;
+
     public ChessPosition(int row, int col) {
         this.row = row;
         this.col = col;
@@ -45,15 +32,17 @@ public class ChessPosition {
     public int getColumn() {
         return this.col;
     }
-    /**
-     * 8    r   n   b   q   k   b   n   r
-     * 7    p   p   p   p   p   p   p   p
-     * 6    {black}
-     * 5
-     * 4
-     * 3    {white}
-     * 2    P   P   P   P   P   P   P   P
-     * 1    R   N   B   Q   K   B   N   R
-     *      1   2   3   4   5   6   7   8
-     */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPosition position = (ChessPosition) o;
+        return row == position.row && col == position.col;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, col);
+    }
 }
