@@ -52,8 +52,42 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece current_piece = getBoard().getPiece(startPosition);
+        if (current_piece == null) {
+            return null;
+        }
+        TeamColor friendly_color = current_piece.getTeamColor();
+        // Get moves
+        Collection<ChessMove> testMoves = current_piece.pieceMoves(getBoard(), startPosition);
+        Collection<ChessMove> validMoves = new HashSet<>();
+        // Simulate all moves to see if the move will put the king in danger
+        ChessBoard currentBoard = new ChessBoard(getBoard());
+        for (ChessMove move : testMoves) {
+            ChessBoard temp = new ChessBoard(currentBoard);
+            ChessPiece piece_in_end_place = temp.getPiece(move.getEndPosition());
+
+            temp.removePiece(startPosition);
+            temp.addPiece(move.getEndPosition(), current_piece);
+
+            setBoard(temp);
+            if (!isInCheck(friendly_color)) {
+                validMoves.add(move);
+            }
+            temp.removePiece(move.getEndPosition());
+            temp.addPiece(move.getEndPosition(), piece_in_end_place);
+            temp.addPiece(startPosition, current_piece);
+
+            setBoard(temp);
+        }
+        return validMoves;
     }
+
+    /**
+     * Invalid Moves are defined as the following:
+     *    If the chess piece cannot move there
+     *    If the move leaves the team's king in danger (i.e. check)
+     *    If the move is not the corresponding team's turn
+     */
 
     /**
      * Makes a move in a chess game
