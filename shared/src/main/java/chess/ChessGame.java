@@ -1,6 +1,9 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -69,7 +72,39 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        TeamColor friendly_color = teamColor;
+        ChessPosition friendly_king_position = null;
+
+        // Get all the validMoves from the opposing team
+        Collection<ChessMove> all_valid_moves = new HashSet<>();
+        ChessBoard current_board = getBoard();
+        for (int i = 0; i < current_board.BOARDSIZE; i++) {
+            for (int j = 0; j < current_board.BOARDSIZE; j++) {
+                ChessPosition current_position = new ChessPosition(i + 1, j + 1);
+                ChessPiece current_piece = current_board.getPiece(current_position);
+                if (current_piece != null) {
+                    // Piece is there
+                    if (current_piece.getPieceType() == ChessPiece.PieceType.KING && current_piece.getTeamColor() == friendly_color) {
+                        friendly_king_position = current_position;
+                    }
+                    if (current_piece.getTeamColor() != friendly_color) {
+                        all_valid_moves.addAll(current_piece.pieceMoves(current_board, current_position));
+                    }
+                }
+            }
+        }
+
+        if (all_valid_moves.isEmpty()) {
+            return false;
+        }
+
+        for (ChessMove move : all_valid_moves) {
+            ChessPosition move_end_position = move.getEndPosition();
+            if (move_end_position.getColumn() == friendly_king_position.getColumn() && move_end_position.getRow() == friendly_king_position.getRow()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

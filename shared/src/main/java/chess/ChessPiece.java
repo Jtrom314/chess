@@ -544,7 +544,7 @@ public class ChessPiece {
         try {
             // Get piece at end position
             ChessPiece current_piece = board.getPiece(endPosition);
-            if (current_piece.getPieceType() != PieceType.KING && current_piece.getTeamColor() != friendly_color) {
+            if (current_piece.getTeamColor() != friendly_color) {
                 return new ChessMove(startPosition, endPosition, null);
             }
             return null;
@@ -566,7 +566,7 @@ public class ChessPiece {
         if (capture) {
             try {
                 ChessPiece current_piece = board.getPiece(endPosition);
-                if (current_piece.getPieceType() != PieceType.KING && current_piece.getTeamColor() != friendly_color) {
+                if (current_piece.getTeamColor() != friendly_color) {
                     ChessMove move_1 = new ChessMove(startPosition, endPosition, PieceType.QUEEN);
                     ChessMove move_2 = new ChessMove(startPosition, endPosition, PieceType.BISHOP);
                     ChessMove move_3 = new ChessMove(startPosition, endPosition, PieceType.KNIGHT);
