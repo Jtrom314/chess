@@ -115,7 +115,25 @@ public class ChessGame {
             throw new InvalidMoveException("Piece cannot move there either because it leaves the king in danger or move does not exist");
         }
 
+        //TODO: finish this function
+        // Make the actual move
 
+        if (move.getPromotionPiece() != null) {
+            current_piece.setPieceType(move.getPromotionPiece());
+        }
+
+        ChessBoard current_board = getBoard();
+        // Remove piece at starting position
+        current_board.removePiece(start_position);
+        // Add piece at ending position
+        current_board.addPiece(end_position, current_piece);
+        setBoard(current_board);
+
+        if (getTeamTurn() == TeamColor.WHITE) {
+            setTeamTurn(TeamColor.BLACK);
+        } else {
+            setTeamTurn(TeamColor.WHITE);
+        }
     }
 
     /**
@@ -144,6 +162,9 @@ public class ChessGame {
                     }
                 }
             }
+        }
+        if (friendly_king_position == null) {
+            return false;
         }
 
         if (all_valid_moves.isEmpty()) {
