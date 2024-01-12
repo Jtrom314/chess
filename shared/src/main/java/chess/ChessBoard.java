@@ -13,6 +13,10 @@ public class ChessBoard {
 
     int BOARDSIZE = 8;
     ChessPiece[][] chessboard = new ChessPiece[BOARDSIZE][BOARDSIZE];
+    public ChessBoard(ChessBoard board) {
+        this.chessboard = board.chessboard;
+        this.BOARDSIZE = board.BOARDSIZE;
+    }
 
     public ChessBoard() {
 
@@ -43,6 +47,13 @@ public class ChessBoard {
         int col = position.getColumn();
 
         return this.chessboard[BOARDSIZE - row][col - 1];
+    }
+
+    public void removePiece(ChessPosition position) {
+        int row = position.getRow();
+        int col = position.getColumn();
+
+        this.chessboard[BOARDSIZE - row][col - 1] = null;
     }
 
     /**
