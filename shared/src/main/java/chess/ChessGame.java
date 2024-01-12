@@ -117,7 +117,7 @@ public class ChessGame {
             return false;
         }
 
-        // Get all the validMoves from the opposing team
+        // Get all the validMoves for the King
         Collection<ChessMove> all_valid_king = new HashSet<>();
         ChessBoard current_board = getBoard();
         for (int i = 0; i < current_board.BOARDSIZE; i++) {
@@ -134,7 +134,6 @@ public class ChessGame {
         }
 
         ChessBoard temp_board = new ChessBoard(current_board);
-        int counter = 0;
         // For each king valid move, move the king to the valid position and check to see if it is still in check
         for (ChessMove king_move : all_valid_king) {
             ChessPosition start_position = king_move.getStartPosition();
@@ -151,7 +150,6 @@ public class ChessGame {
             setBoard(current_board);
             temp_board.removePiece(end_position);
             temp_board.addPiece(start_position, king);
-            counter++;
         }
         return true;
     }
@@ -163,7 +161,41 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // Get all the validMoves for the King
+        Collection<ChessMove> all_valid_king = new HashSet<>();
+        ChessBoard current_board = getBoard();
+        for (int i = 0; i < current_board.BOARDSIZE; i++) {
+            for (int j = 0; j < current_board.BOARDSIZE; j++) {
+                ChessPosition current_position = new ChessPosition(i + 1, j + 1);
+                ChessPiece current_piece = current_board.getPiece(current_position);
+                if (current_piece != null) {
+                    // Piece is there
+                    if (current_piece.getPieceType() == ChessPiece.PieceType.KING && current_piece.getTeamColor() == teamColor) {
+                        all_valid_king.addAll(current_piece.pieceMoves(current_board, current_position));
+                    }
+                }
+            }
+        }
+        ChessBoard temp_board = new ChessBoard(current_board);
+        // For each king valid move, move the king to the valid position and check to see if it is still in check
+        for (ChessMove king_move : all_valid_king) {
+            ChessPosition start_position = king_move.getStartPosition();
+            ChessPosition end_position = king_move.getEndPosition();
+
+            ChessPiece king = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+            temp_board.removePiece(start_position);
+            temp_board.addPiece(end_position, king);
+            setBoard(temp_board);
+            if (!isInCheck(teamColor)) {
+                setBoard(current_board);
+                return false;
+            }
+            setBoard(current_board);
+            temp_board.removePiece(end_position);
+            temp_board.addPiece(start_position, king);
+        }
+
+        return !isInCheck(teamColor);
     }
 
     /**
