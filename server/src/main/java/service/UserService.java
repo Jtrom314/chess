@@ -16,9 +16,17 @@ public class UserService extends SharedService{
         try {
             return dataAccess.getUser(username);
         } catch (DataAccessException exception) {
-            //
+            throw new DataAccessException(exception.getMessage());
         }
-        return null;
+    }
+
+    // createUser
+    public void createUser(UserData user) throws DataAccessException {
+        try {
+            dataAccess.createUser(user);
+        } catch (DataAccessException exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 
     // forwardAuthCreation
@@ -26,8 +34,16 @@ public class UserService extends SharedService{
         try {
             return authService.createAuth(username);
         } catch (DataAccessException exception) {
-            //
+            throw new DataAccessException(exception.getMessage());
         }
-        return null;
+    }
+
+    // forwardAuthFetch
+    public AuthData forwardAuthFetch(String username) throws DataAccessException {
+        try {
+            return authService.getAuthByUsername(username);
+        } catch (DataAccessException exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 }

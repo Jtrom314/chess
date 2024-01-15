@@ -2,6 +2,9 @@ package server;
 
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
+import server.handlers.ExceptionalHandlers;
+import server.handlers.GameHandlers;
+import server.handlers.UserHandlers;
 import service.AuthenticationService;
 import spark.*;
 
@@ -9,14 +12,13 @@ import java.nio.file.Paths;
 
 public class Server {
 
-    private UserHandlers userHandlers;
-    private GameHandlers gameHandlers;
-    private ExceptionalHandlers exceptionalHandlers;
-    private AuthenticationService authService;
-    private DataAccess dataAccess;
+    private final UserHandlers userHandlers;
+    private final GameHandlers gameHandlers;
+    private final ExceptionalHandlers exceptionalHandlers;
+
     public Server() {
-        this.dataAccess = new MemoryDataAccess();
-        this.authService = new AuthenticationService(dataAccess);
+        DataAccess dataAccess = new MemoryDataAccess();
+        AuthenticationService authService = new AuthenticationService(dataAccess);
         this.userHandlers = new UserHandlers(dataAccess, authService);
         this.gameHandlers = new GameHandlers(dataAccess, authService);
         this.exceptionalHandlers = new ExceptionalHandlers(dataAccess);
@@ -29,10 +31,14 @@ public class Server {
         Spark.externalStaticFileLocation(webDir.toString());
 
         // Register your endpoints and handle exceptions here.
-        Spark.post("/user", (req, res) -> {
-             return userHandlers.register(req, res);
-        });
-        // Spark.exception();
+        Spark.post("/user", userHandlers::register);
+        Spark.post("/session", userHandlers::login);
+        Spark.delete("/session", userHandlers::logout);
+
+
+
+        Spark.delete("/db", exceptionalHandlers::clear);
+        Spark.exception(ResponseException.class, exceptionalHandlers::handleException);
 
         Spark.awaitInitialization();
         return Spark.port();
