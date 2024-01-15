@@ -68,7 +68,6 @@ public class GameHandlers {
                 throw new ResponseException(401, "unauthorized");
             }
             GameData game = gameService.getGame(request.gameID());
-
             switch (request.playerColor()) {
                 case "BLACK":
                     if (game.blackUsername() != null) {
