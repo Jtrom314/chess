@@ -1,11 +1,25 @@
 package server;
 
+import dataAccess.DataAccess;
+import dataAccess.MemoryDataAccess;
+import service.AuthenticationService;
 import spark.*;
 
 import java.nio.file.Paths;
 
 public class Server {
+
+    private UserHandlers userHandlers;
+    private GameHandlers gameHandlers;
+    private ExceptionalHandlers exceptionalHandlers;
+    private AuthenticationService authService;
+    private DataAccess dataAccess;
     public Server() {
+        this.dataAccess = new MemoryDataAccess();
+        this.authService = new AuthenticationService(dataAccess);
+        this.userHandlers = new UserHandlers(dataAccess, authService);
+        this.gameHandlers = new GameHandlers(dataAccess, authService);
+        this.exceptionalHandlers = new ExceptionalHandlers(dataAccess);
     }
 
     public int run(int desiredPort) {
@@ -15,14 +29,10 @@ public class Server {
         Spark.externalStaticFileLocation(webDir.toString());
 
         // Register your endpoints and handle exceptions here.
-        Spark.delete("/db", this::clear);
-        Spark.post("/user", this::register);
-        Spark.post("/session", this::login);
-        Spark.delete("/session", this::logout);
-        Spark.get("/game", this::listGames);
-        Spark.post("/game", this::createGame);
-        Spark.put("/game", this::joinGame);
-        Spark.exception(Exception.class, this::exceptionHandler);
+        Spark.post("/user", (req, res) -> {
+             return userHandlers.register(req, res);
+        });
+        // Spark.exception();
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -31,7 +41,4 @@ public class Server {
     public void stop() {
         Spark.stop();
     }
-
-    // Handlers
-
 }

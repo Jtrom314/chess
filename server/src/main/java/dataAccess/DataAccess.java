@@ -6,31 +6,31 @@ import model.AuthData;
 public interface DataAccess {
     // UserDAO
     // Create
-    void createUser(UserData user) throws DataAccessException;
+    public void createUser(UserData user) throws DataAccessException;
 
     // Read
-    UserData getUser(String username) throws DataAccessException;
+    public UserData getUser(String username) throws DataAccessException;
 
     // AuthDAO
     // Create
-    String createAuthentication(String username) throws DataAccessException;
+    public String createAuthentication(String username) throws DataAccessException;
 
     // Read
-    AuthData getAuthenticationByAuthToken(String authToken) throws  DataAccessException;
-    AuthData getAuthenticationByUsername(String username) throws DataAccessException;
+    public AuthData getAuthenticationByAuthToken(String authToken) throws  DataAccessException;
+    public AuthData getAuthenticationByUsername(String username) throws DataAccessException;
 
     // GameDAO
     // Create
-    void createGame(GameData game) throws  DataAccessException;
+    public void createGame(GameData game) throws  DataAccessException;
 
     // Read
-    GameData getGameById(int id) throws DataAccessException;
-    GameData[] getGameList() throws DataAccessException;
+    public GameData getGameById(int id) throws DataAccessException;
+    public GameData[] getGameList() throws DataAccessException;
 
     // Update
-    void updateGame(GameData game) throws DataAccessException;
+    public void updateGame(GameData game) throws DataAccessException;
 
     // All
     // Delete
-    void clear() throws DataAccessException;
+    public void clear() throws DataAccessException;
 }

@@ -15,19 +15,19 @@ public class MemoryDataAccess implements DataAccess {
 
     // UserDAO
     // Create
-    void createUser(UserData user) throws DataAccessException {
+    public void createUser(UserData user) throws DataAccessException {
         String username = user.username();
         users.put(username, user);
     }
 
     // Read
-    UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) throws DataAccessException {
         return users.get(username);
     }
 
     // AuthDAO
     // Create
-    String createAuthentication(String username) throws DataAccessException {
+    public String createAuthentication(String username) throws DataAccessException {
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(authToken, username);
         authByToken.put(authToken, auth);
@@ -36,27 +36,27 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     // Read
-    AuthData getAuthenticationByAuthToken(String authToken) throws DataAccessException {
+    public AuthData getAuthenticationByAuthToken(String authToken) throws DataAccessException {
         return authByToken.get(authToken);
     }
 
-    AuthData getAuthenticationByUsername(String username) throws DataAccessException {
+    public AuthData getAuthenticationByUsername(String username) throws DataAccessException {
         return authByUsername.get(username);
     }
 
     // GameDAO
     // Create
-    void createGame(GameData game) throws DataAccessException {
+    public void createGame(GameData game) throws DataAccessException {
         int id = game.gameID();
         games.put(id, game);
     }
 
     // Read
-    GameData getGameById(int id) throws DataAccessException {
+    public GameData getGameById(int id) throws DataAccessException {
         return games.get(id);
     }
 
-    GameData[] getGameList() throws DataAccessException {
+    public GameData[] getGameList() throws DataAccessException {
         GameData[] listOfGames = new GameData[games.size()];
         int i = 0;
         for (int key : games.keySet()) {
@@ -68,14 +68,14 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     // Update
-    void updateGame(GameData game) throws DataAccessException {
+    public void updateGame(GameData game) throws DataAccessException {
         int id = game.gameID();
         games.put(id, game);
     }
 
     // All
     // Delete
-    void clear() throws DataAccessException {
+    public void clear() throws DataAccessException {
         users.clear();
         authByUsername.clear();
         authByToken.clear();
