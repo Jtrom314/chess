@@ -7,8 +7,8 @@ import model.UserData;
 
 public class UserService extends SharedService{
 
-    public UserService (DataAccess dataAccess, AuthenticationService authService) {
-        super(dataAccess, authService);
+    public UserService (AuthenticationService authService) {
+        super(authService);
     }
 
     //getUser

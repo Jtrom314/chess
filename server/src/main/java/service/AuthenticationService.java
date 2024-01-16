@@ -5,7 +5,7 @@ import dataAccess.DataAccessException;
 import model.AuthData;
 
 public class AuthenticationService {
-    private final DataAccess dataAccess;
+    public final DataAccess dataAccess;
 
     public AuthenticationService (DataAccess dataAccess) {
         this.dataAccess = dataAccess;
@@ -16,9 +16,8 @@ public class AuthenticationService {
         try {
             return dataAccess.createAuthentication(username);
         } catch (DataAccessException exception) {
-            //
+            throw new DataAccessException(exception.getMessage());
         }
-        return null;
     }
 
     // getAuthByUsername
@@ -26,9 +25,8 @@ public class AuthenticationService {
         try {
             return dataAccess.getAuthenticationByUsername(username);
         } catch (DataAccessException exception) {
-            //
+            throw new DataAccessException(exception.getMessage());
         }
-        return null;
     }
 
     // getAuthByAuthToken
@@ -36,8 +34,9 @@ public class AuthenticationService {
         try {
             return dataAccess.getAuthenticationByAuthToken(authToken);
         } catch (DataAccessException exception) {
-            //
+            throw new DataAccessException(exception.getMessage());
         }
-        return null;
     }
+
+
 }

@@ -19,8 +19,8 @@ import spark.Response;
 public class GameHandlers {
     private final GameService gameService;
     private int gameID = 0;
-    public GameHandlers(DataAccess dataAccess, AuthenticationService authService) {
-        this.gameService = new GameService(dataAccess, authService);
+    public GameHandlers(AuthenticationService authService) {
+        this.gameService = new GameService(authService);
     }
 
 

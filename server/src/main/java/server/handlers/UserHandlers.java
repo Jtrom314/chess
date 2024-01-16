@@ -16,8 +16,8 @@ import spark.Response;
 
 public class UserHandlers {
     private final UserService userService;
-    public UserHandlers(DataAccess dataAccess, AuthenticationService authService) {
-        this.userService = new UserService(dataAccess, authService);
+    public UserHandlers(AuthenticationService authService) {
+        this.userService = new UserService(authService);
     }
 
     public Object register(Request req, Response res) throws ResponseException {

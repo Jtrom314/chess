@@ -5,8 +5,8 @@ import dataAccess.DataAccessException;
 import model.GameData;
 
 public class GameService extends SharedService{
-    public GameService (DataAccess dataAccess, AuthenticationService authService) {
-        super(dataAccess, authService);
+    public GameService (AuthenticationService authService) {
+        super(authService);
     }
 
     public GameData[] getGames () throws DataAccessException {
