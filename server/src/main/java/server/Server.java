@@ -18,9 +18,8 @@ public class Server {
 
     public Server() {
         DataAccess dataAccess = new MemoryDataAccess();
-        AuthenticationService authService = new AuthenticationService(dataAccess);
-        this.userHandlers = new UserHandlers(authService);
-        this.gameHandlers = new GameHandlers(authService);
+        this.userHandlers = new UserHandlers(dataAccess);
+        this.gameHandlers = new GameHandlers(dataAccess);
         this.exceptionalHandlers = new ExceptionalHandlers(dataAccess);
     }
 

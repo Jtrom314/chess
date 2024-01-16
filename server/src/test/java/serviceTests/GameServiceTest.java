@@ -1,5 +1,6 @@
 package serviceTests;
 
+import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,7 +8,7 @@ import service.AuthenticationService;
 import service.GameService;
 
 public class GameServiceTest {
-    static final GameService gameService = new GameService(new AuthenticationService(new MemoryDataAccess()));
+    static final GameService gameService = new GameService(new MemoryDataAccess());
 
     @BeforeEach
     void clear () throws RuntimeException {

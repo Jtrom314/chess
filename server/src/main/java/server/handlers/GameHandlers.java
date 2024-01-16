@@ -18,9 +18,11 @@ import spark.Response;
 
 public class GameHandlers {
     private final GameService gameService;
+    private final AuthenticationService authService;
     private int gameID = 0;
-    public GameHandlers(AuthenticationService authService) {
-        this.gameService = new GameService(authService);
+    public GameHandlers(DataAccess dataAccess) {
+        this.gameService = new GameService(dataAccess);
+        this.authService = new AuthenticationService(dataAccess);
     }
 
 
@@ -29,7 +31,7 @@ public class GameHandlers {
         Gson gson = new Gson();
         String authToken = req.headers("authorization");
         try {
-            AuthData auth = gameService.verifyAuthToken(authToken);
+            AuthData auth = authService.getAuthByAuthToken(authToken);
             if (!auth.authToken().equals(authToken)) {
                 throw new ResponseException(401, "unauthorized");
             }
@@ -45,7 +47,7 @@ public class GameHandlers {
         CreateGameRequest request = (CreateGameRequest)gson.fromJson(req.body(), CreateGameRequest.class);
         String authToken = req.headers("authorization");
         try {
-            AuthData auth = gameService.verifyAuthToken(authToken);
+            AuthData auth = authService.getAuthByAuthToken(authToken);
             if (!auth.authToken().equals(authToken)) {
                 throw new ResponseException(401, "unauthorized");
             }
@@ -63,7 +65,7 @@ public class GameHandlers {
         JoinGameRequest request = (JoinGameRequest)gson.fromJson(req.body(), JoinGameRequest.class);
         String authToken = req.headers("authorization");
         try {
-            AuthData auth = gameService.verifyAuthToken(authToken);
+            AuthData auth = authService.getAuthByAuthToken(authToken);
             if (!auth.authToken().equals(authToken)) {
                 throw new ResponseException(401, "unauthorized");
             }

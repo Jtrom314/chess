@@ -16,8 +16,10 @@ import spark.Response;
 
 public class UserHandlers {
     private final UserService userService;
-    public UserHandlers(AuthenticationService authService) {
-        this.userService = new UserService(authService);
+    private final AuthenticationService authService;
+    public UserHandlers(DataAccess dataAccess) {
+        this.userService = new UserService(dataAccess);
+        this.authService = new AuthenticationService(dataAccess);
     }
 
     public Object register(Request req, Response res) throws ResponseException {
@@ -26,7 +28,7 @@ public class UserHandlers {
         try {
             if (userService.getUser(request.username()) == null) {
                 userService.createUser(new UserData(request.username(), request.password(), request.email()));
-                String authToken = userService.forwardAuthCreation(request.username());
+                String authToken = authService.createAuth(request.username());
                 return gson.toJson(new RegisterResult(request.username(), authToken));
             } else {
                 throw new ResponseException(403, "already Taken");
@@ -41,7 +43,7 @@ public class UserHandlers {
         LoginRequest request = (LoginRequest)gson.fromJson(req.body(), LoginRequest.class);
         try {
             if (userService.getUser(request.username()) != null) {
-                AuthData auth = userService.forwardAuthFetch(request.username());
+                AuthData auth = authService.getAuthByUsername(request.username());
                 return gson.toJson(auth);
             } else {
                 throw new ResponseException(401, "unauthorized");
@@ -54,7 +56,7 @@ public class UserHandlers {
     public Object logout(Request req, Response res) throws ResponseException {
         String authToken = req.headers("authorization");
         try {
-            AuthData auth = userService.verifyAuthToken(authToken);
+            AuthData auth = authService.getAuthByAuthToken(authToken);
             if (!auth.authToken().equals(authToken)) {
                 throw new ResponseException(401, "unauthorized");
             }

@@ -5,10 +5,11 @@ import dataAccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 
-public class UserService extends SharedService{
+public class UserService {
+    private final DataAccess dataAccess;
 
-    public UserService (AuthenticationService authService) {
-        super(authService);
+    public UserService (DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
     }
 
     //getUser
@@ -29,21 +30,4 @@ public class UserService extends SharedService{
         }
     }
 
-    // forwardAuthCreation
-    public String forwardAuthCreation(String username) throws DataAccessException {
-        try {
-            return authService.createAuth(username);
-        } catch (DataAccessException exception) {
-            throw new DataAccessException(exception.getMessage());
-        }
-    }
-
-    // forwardAuthFetch
-    public AuthData forwardAuthFetch(String username) throws DataAccessException {
-        try {
-            return authService.getAuthByUsername(username);
-        } catch (DataAccessException exception) {
-            throw new DataAccessException(exception.getMessage());
-        }
-    }
 }

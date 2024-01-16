@@ -8,7 +8,7 @@ import service.AuthenticationService;
 import service.UserService;
 
 public class UserServiceTest {
-    static final UserService userService = new UserService(new AuthenticationService(new MemoryDataAccess()));
+    static final UserService userService = new UserService(new MemoryDataAccess());
 
     @BeforeEach
     void clear () throws ResponseException {
@@ -32,25 +32,6 @@ public class UserServiceTest {
 
     @Test
     void createUserNegative () throws ResponseException {
-
-    }
-
-    @Test
-    void forwardAuthCreationPositive () throws ResponseException {
-
-    }
-    @Test
-    void forwardAuthCreationNegative () throws ResponseException {
-
-    }
-
-    @Test
-    void forwardAuthFetchPositive () throws ResponseException {
-
-    }
-
-    @Test
-    void forwardAuthFetchNegative () throws ResponseException {
 
     }
 }
