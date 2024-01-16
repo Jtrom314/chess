@@ -1,23 +1,22 @@
 package server.handlers;
 
 import dataAccess.DataAccess;
-import dataAccess.DataAccessException;
 import server.ResponseException;
+import service.ClearService;
 import spark.Request;
 import spark.Response;
 
 public class ExceptionalHandlers {
-    private final DataAccess dataAccess;
+    private final ClearService clearService;
     public ExceptionalHandlers(DataAccess dataAccess) {
-        this.dataAccess = dataAccess;
+        this.clearService = new ClearService(dataAccess);
     }
 
     public Object clear(Request req, Response res) throws ResponseException {
         try {
-            dataAccess.clear();
-            res.status(200);
-        } catch (DataAccessException exception) {
-            throw new ResponseException(500, exception.getMessage());
+            clearService.clear();
+        } catch (ResponseException exception) {
+            throw new ResponseException(exception.statusCode(), exception.getMessage());
         }
         return null;
     }

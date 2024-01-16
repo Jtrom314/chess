@@ -5,7 +5,6 @@ import dataAccess.MemoryDataAccess;
 import server.handlers.ExceptionalHandlers;
 import server.handlers.GameHandlers;
 import server.handlers.UserHandlers;
-import service.AuthenticationService;
 import spark.*;
 
 import java.nio.file.Paths;
@@ -21,6 +20,10 @@ public class Server {
         this.userHandlers = new UserHandlers(dataAccess);
         this.gameHandlers = new GameHandlers(dataAccess);
         this.exceptionalHandlers = new ExceptionalHandlers(dataAccess);
+    }
+
+    public static void main(String[] args) {
+        new Server().run(8080);
     }
 
     public int run(int desiredPort) {

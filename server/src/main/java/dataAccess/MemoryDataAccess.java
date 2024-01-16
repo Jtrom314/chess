@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class MemoryDataAccess implements DataAccess {
-    final private HashMap<String, UserData> users = new HashMap<>();
-    final private HashMap<String, AuthData> authByToken = new HashMap<>();
-    final private HashMap<String, AuthData> authByUsername = new HashMap<>();
-    final private HashMap<Integer, GameData> games = new HashMap<>();
+    public HashMap<String, UserData> users = new HashMap<>();
+    public HashMap<String, AuthData> authByToken = new HashMap<>();
+    public HashMap<String, AuthData> authByUsername = new HashMap<>();
+    public HashMap<Integer, GameData> games = new HashMap<>();
 
     // UserDAO
     // Create
@@ -42,6 +42,16 @@ public class MemoryDataAccess implements DataAccess {
 
     public AuthData getAuthenticationByUsername(String username) throws DataAccessException {
         return authByUsername.get(username);
+    }
+
+    // Delete
+
+
+    public void removeAuthentication(AuthData auth) throws DataAccessException {
+        String authToken = auth.authToken();
+        String username = auth.username();
+        authByToken.remove(authToken);
+        authByUsername.remove(username);
     }
 
     // GameDAO

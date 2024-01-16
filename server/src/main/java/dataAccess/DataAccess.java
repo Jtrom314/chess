@@ -19,6 +19,9 @@ public interface DataAccess {
     public AuthData getAuthenticationByAuthToken(String authToken) throws  DataAccessException;
     public AuthData getAuthenticationByUsername(String username) throws DataAccessException;
 
+    // Delete
+    public void removeAuthentication(AuthData auth) throws DataAccessException;
+
     // GameDAO
     // Create
     public void createGame(GameData game) throws  DataAccessException;
