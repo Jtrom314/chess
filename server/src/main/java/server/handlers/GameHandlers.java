@@ -11,6 +11,7 @@ import service.ListGamesService;
 import spark.Request;
 import spark.Response;
 
+
 public class GameHandlers {
 
     private final ListGamesService listGamesService;
@@ -37,6 +38,9 @@ public class GameHandlers {
     public Object createGame(Request req, Response res) throws ResponseException {
         Gson gson = new Gson();
         CreateGameRequest request = (CreateGameRequest)gson.fromJson(req.body(), CreateGameRequest.class);
+        if (request.gameName() == null) {
+            throw new ResponseException(400, "bad request");
+        }
         String authToken = req.headers("authorization");
         try {
             return gson.toJson(createGameService.createGame(authToken, request));
@@ -48,6 +52,9 @@ public class GameHandlers {
     public Object joinGame(Request req, Response res) throws ResponseException {
         Gson gson = new Gson();
         JoinGameRequest request = (JoinGameRequest)gson.fromJson(req.body(), JoinGameRequest.class);
+        if (request.gameID() == 0) {
+            throw new ResponseException(400, "bad request");
+        }
         String authToken = req.headers("authorization");
         try {
             joinGameService.joinGame(authToken, request);

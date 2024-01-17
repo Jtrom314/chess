@@ -24,6 +24,9 @@ public class UserHandlers {
     public Object register(Request req, Response res) throws ResponseException {
         Gson gson = new Gson();
         RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
+        if (request.username() == null || request.password() == null || request.email() == null) {
+            throw new ResponseException(400, "bad request");
+        }
         try {
             return gson.toJson(registerService.register(request));
         } catch (ResponseException exception) {

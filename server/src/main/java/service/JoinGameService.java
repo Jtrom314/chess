@@ -20,21 +20,23 @@ public class JoinGameService extends SharedService {
             }
             GameData game = dataAccess.getGameById(request.gameID());
             GameData updatedGame;
-            switch (request.playerColor()) {
+
+            String playerColor = request.playerColor() == null ? "" : request.playerColor();
+            switch (playerColor) {
                 case "BLACK":
-                    if (game.blackUsername() != null) {
-                        throw new ResponseException(403, "already taken");
+                    if (game.blackUsername() == null) {
+                        updatedGame = new GameData(game.gameID(), game.whiteUsername(), auth.username(), game.gameName(), game.game());
+                        dataAccess.updateGame(updatedGame);
+                        return;
                     }
-                    updatedGame = new GameData(game.gameID(), game.whiteUsername(), auth.username(), game.gameName(), game.game());
-                    dataAccess.updateGame(updatedGame);
-                    return;
+                    throw new ResponseException(403, "already taken");
                 case "WHITE":
-                    if (game.whiteUsername() != null) {
-                        throw new ResponseException(403, "already taken");
+                    if (game.whiteUsername() == null) {
+                        updatedGame = new GameData(game.gameID(), auth.username(), game.blackUsername(), game.gameName(), game.game());
+                        dataAccess.updateGame(updatedGame);
+                        return;
                     }
-                    updatedGame = new GameData(game.gameID(), auth.username(), game.blackUsername(), game.gameName(), game.game());
-                    dataAccess.updateGame(updatedGame);
-                    return;
+                    throw new ResponseException(403, "already taken");
                 default:
                     return;
             }

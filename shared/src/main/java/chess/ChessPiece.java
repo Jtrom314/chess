@@ -77,7 +77,7 @@ public class ChessPiece {
         return null;
     }
 
-    public  Collection<ChessMove> kingsMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> kingsMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new HashSet<>();
         ChessGame.TeamColor friendly_color = getTeamColor();
         int current_row = myPosition.getRow();

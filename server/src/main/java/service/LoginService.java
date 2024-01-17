@@ -2,7 +2,6 @@ package service;
 
 import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
-import model.UserData;
 import server.ResponseException;
 import server.request.LoginRequest;
 import server.result.LoginResult;
