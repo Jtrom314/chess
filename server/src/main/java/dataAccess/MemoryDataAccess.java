@@ -3,6 +3,7 @@ package dataAccess;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -17,7 +18,9 @@ public class MemoryDataAccess implements DataAccess {
     // Create
     public void createUser(UserData user) throws DataAccessException {
         String username = user.username();
-        users.put(username, user);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        UserData updatedUser = new UserData(user.username(), encoder.encode(user.password()), user.email());
+        users.put(username, updatedUser);
     }
 
     // Read
