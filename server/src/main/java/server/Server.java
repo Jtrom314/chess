@@ -29,9 +29,9 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
-//        var x = Server.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-//        var webDir = Paths.get(x, "web");
-var webDir = "web";
+        var x = Server.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+       var webDir = Paths.get(x, "web");
+        //var webDir = "web";
         Spark.externalStaticFileLocation(webDir.toString());
 
         // Register your endpoints and handle exceptions here.
