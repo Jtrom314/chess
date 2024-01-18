@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class SQLDataAccess implements DataAccess {
 
@@ -45,19 +46,44 @@ public class SQLDataAccess implements DataAccess {
     }
 
     public String createAuthentication(String username) throws DataAccessException {
-        return null;
+        String authToken = UUID.randomUUID().toString();
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var preparedStatement = connection.prepareStatement("INSERT INTO AuthData (authToken, username) VALUES (?, ?)")) {
+                preparedStatement.setString(1, authToken);
+                preparedStatement.setString(2, username);
+                preparedStatement.executeUpdate();
+                return authToken;
+            }
+        } catch (SQLException exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 
     public AuthData getAuthenticationByAuthToken(String authToken) throws DataAccessException {
-        return null;
-    }
-
-    public AuthData getAuthenticationByUsername(String username) throws DataAccessException {
-        return null;
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var preparedStatement = connection.prepareStatement("SELECT username FROM AuthData WHERE authToken = ?")) {
+                preparedStatement.setString(1, authToken);
+                try (var response = preparedStatement.executeQuery()) {
+                    if (response.next()) {
+                        return new AuthData(authToken, response.getString("username"));
+                    }
+                    return null;
+                }
+            }
+        } catch (SQLException exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 
     public void removeAuthentication(AuthData auth) throws DataAccessException {
-
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var preparedStatement = connection.prepareStatement("DELETE FROM AuthData WHERE authToken = ?")) {
+                preparedStatement.setString(1, auth.authToken());
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 
     public void createGame(GameData game) throws DataAccessException {

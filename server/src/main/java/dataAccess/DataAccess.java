@@ -17,7 +17,6 @@ public interface DataAccess {
 
     // Read
     public AuthData getAuthenticationByAuthToken(String authToken) throws  DataAccessException;
-    public AuthData getAuthenticationByUsername(String username) throws DataAccessException;
 
     // Delete
     public void removeAuthentication(AuthData auth) throws DataAccessException;

@@ -43,9 +43,6 @@ public class MemoryDataAccess implements DataAccess {
         return authByToken.get(authToken);
     }
 
-    public AuthData getAuthenticationByUsername(String username) throws DataAccessException {
-        return authByUsername.get(username);
-    }
 
     // Delete
 
