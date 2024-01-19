@@ -23,7 +23,7 @@ public interface DataAccess {
 
     // GameDAO
     // Create
-    public void createGame(GameData game) throws  DataAccessException;
+    public int createGame(GameData game) throws  DataAccessException;
 
     // Read
     public GameData getGameById(int id) throws DataAccessException;

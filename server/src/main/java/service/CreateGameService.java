@@ -12,10 +12,8 @@ import server.result.CreateGameResult;
 public class CreateGameService extends SharedService {
     public CreateGameService(DataAccess dataAccess) {
         super(dataAccess);
-        this.gameID = 0;
     }
 
-    private int gameID;
 
     public CreateGameResult createGame(String authToken, CreateGameRequest request) throws ResponseException {
         try {
@@ -23,9 +21,8 @@ public class CreateGameService extends SharedService {
             if (auth == null) {
                 throw new ResponseException(401, "unauthorized");
             }
-            GameData game = new GameData(gameID, null, null, request.gameName(), new ChessGame());
-            dataAccess.createGame(game);
-            gameID++;
+            GameData game = new GameData(0, null, null, request.gameName(), new ChessGame());
+            int gameID = dataAccess.createGame(game);
             return new CreateGameResult(gameID);
         } catch (DataAccessException exception) {
             throw new ResponseException(500, exception.getMessage());

@@ -1,5 +1,6 @@
 package dataAccess;
 
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -7,7 +8,10 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.UUID;
+
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SQLDataAccess implements DataAccess {
 
@@ -86,8 +90,28 @@ public class SQLDataAccess implements DataAccess {
         }
     }
 
-    public void createGame(GameData game) throws DataAccessException {
+    public int createGame(GameData game) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var preparedStatement = connection.prepareStatement("INSERT INTO GameData (whiteUsername, blackUsername, gameName, game) VALUES (?,?,?,?)", RETURN_GENERATED_KEYS)) {
+                preparedStatement.setString(1, game.whiteUsername());
+                preparedStatement.setString(2, game.blackUsername());
+                preparedStatement.setString(3, game.gameName());
 
+                Gson gson = new Gson();
+                preparedStatement.setString(4, gson.toJson(game.game()));
+
+                preparedStatement.executeUpdate();
+
+                var result = preparedStatement.getGeneratedKeys();
+                int id = 0;
+                if (result.next()) {
+                    id = result.getInt(1);
+                }
+                return id;
+            }
+        } catch (SQLException exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 
     public GameData getGameById(int id) throws DataAccessException {
@@ -103,7 +127,19 @@ public class SQLDataAccess implements DataAccess {
     }
 
     public void clear() throws DataAccessException {
-
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var preparedStatement = connection.prepareStatement("DELETE FROM UserData")){
+                preparedStatement.executeUpdate();
+            }
+            try (var preparedStatement = connection.prepareStatement("DElETE FROM AuthData")) {
+                preparedStatement.executeUpdate();
+            }
+            try (var preparedStatement = connection.prepareStatement("DELETE FROM GameData")) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 
     private final String[] createAuthTableStatement = {
@@ -134,7 +170,7 @@ public class SQLDataAccess implements DataAccess {
                 `whiteUsername` varchar(256) NULL,
                 `blackUsername` varchar(256) NULL,
                 `gameName` varchar(256) NOT NULL,
-                `game` TEXT NOT NULL,
+                `game` LONGTEXT NOT NULL,
                 PRIMARY KEY (`id`)
             )
             """
@@ -158,6 +194,7 @@ public class SQLDataAccess implements DataAccess {
                     preparedStatement.executeUpdate();
                 }
             }
+            System.out.print("DATABASE CONFIGURED");
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to configure database: %s",ex.getMessage()));
         }

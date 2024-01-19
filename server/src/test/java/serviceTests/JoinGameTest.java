@@ -21,25 +21,26 @@ public class JoinGameTest {
     @Test
     void JoinGameSuccessful () throws Exception {
         String authToken = service.dataAccess.createAuthentication("TEST");
+        int gameID;
 
-        service.dataAccess.createGame(new GameData(0, null, null, "Test", new ChessGame()));
+        gameID = service.dataAccess.createGame(new GameData(0, null, null, "Test", new ChessGame()));
 
-        service.joinGame(authToken, new JoinGameRequest("WHITE", 0));
+        service.joinGame(authToken, new JoinGameRequest("WHITE", gameID));
 
-        GameData game = service.dataAccess.getGameById(0);
+        GameData game = service.dataAccess.getGameById(gameID);
 
-        GameData expected = new GameData(0, "TEST", null, "Test", game.game());
-        GameData actual = service.dataAccess.getGameById(0);
+        GameData expected = new GameData(gameID, "TEST", null, "Test", game.game());
+        GameData actual = service.dataAccess.getGameById(gameID);
 
         assertEquals(expected, actual);
 
-        service.dataAccess.createGame(new GameData(1, "ALREADY", "TAKEN", "Test", new ChessGame()));
+        gameID = service.dataAccess.createGame(new GameData(1, "ALREADY", "TAKEN", "Test", new ChessGame()));
 
-        service.joinGame(authToken, new JoinGameRequest(null, 1));
+        service.joinGame(authToken, new JoinGameRequest(null, gameID));
 
-        game = service.dataAccess.getGameById(1);
-        expected = new GameData(1, "ALREADY", "TAKEN", "Test", game.game());
-        actual = service.dataAccess.getGameById(1);
+        game = service.dataAccess.getGameById(gameID);
+        expected = new GameData(gameID, "ALREADY", "TAKEN", "Test", game.game());
+        actual = service.dataAccess.getGameById(gameID);
 
         assertEquals(expected, actual);
     }
@@ -48,9 +49,9 @@ public class JoinGameTest {
     void JoinFullGameThrowsException () throws Exception{
         String authToken = service.dataAccess.createAuthentication("TEST");
 
-        service.dataAccess.createGame(new GameData(0, "ALREADY", "TAKEN", "Test", new ChessGame()));
+        int gameID = service.dataAccess.createGame(new GameData(0, "ALREADY", "TAKEN", "Test", new ChessGame()));
 
-        ResponseException exception = assertThrows(ResponseException.class, () -> service.joinGame(authToken, new JoinGameRequest("BLACK", 0)));
+        ResponseException exception = assertThrows(ResponseException.class, () -> service.joinGame(authToken, new JoinGameRequest("BLACK", gameID)));
         assertTrue(exception.getMessage().contains("already taken"));
     }
 }

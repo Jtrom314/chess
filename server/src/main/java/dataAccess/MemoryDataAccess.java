@@ -14,6 +14,7 @@ public class MemoryDataAccess implements DataAccess {
     public HashMap<String, AuthData> authByUsername = new HashMap<>();
     public HashMap<Integer, GameData> games = new HashMap<>();
 
+    private int gameID = 0;
     // UserDAO
     // Create
     public void createUser(UserData user) throws DataAccessException {
@@ -56,9 +57,11 @@ public class MemoryDataAccess implements DataAccess {
 
     // GameDAO
     // Create
-    public void createGame(GameData game) throws DataAccessException {
-        int id = game.gameID();
-        games.put(id, game);
+    public int createGame(GameData game) throws DataAccessException {
+        gameID++;
+        GameData updatedGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        games.put(gameID, updatedGame);
+        return gameID;
     }
 
     // Read
