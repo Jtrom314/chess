@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -15,7 +16,6 @@ public class ChessGame {
     private ChessBoard current_board;
 
     public ChessGame() {
-
     }
 
     /**
@@ -286,5 +286,18 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.current_board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return current_team_color == chessGame.current_team_color && Objects.equals(current_board, chessGame.current_board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(current_team_color, current_board);
     }
 }

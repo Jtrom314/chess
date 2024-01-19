@@ -1,5 +1,6 @@
 package dataAccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
@@ -9,6 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -57,6 +60,7 @@ public class SQLDataAccess implements DataAccess {
                 String authToken = UUID.randomUUID().toString();
                 preparedStatement.setString(1, authToken);
                 preparedStatement.setString(2, username);
+
                 preparedStatement.executeUpdate();
                 return authToken;
             }
@@ -117,11 +121,39 @@ public class SQLDataAccess implements DataAccess {
     }
 
     public GameData getGameById(int id) throws DataAccessException {
-        return null;
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var preparedStatement = connection.prepareStatement("SELECT * FROM GameData WHERE id = ?")) {
+                preparedStatement.setInt(1, id);
+                try (var response = preparedStatement.executeQuery()) {
+                    if (response.next()) {
+                        Gson gson = new Gson();
+                        ChessGame game = gson.fromJson(response.getString("game"), ChessGame.class);
+                        return new GameData(response.getInt("id"), response.getString("whiteUsername"), response.getString("blackUsername"), response.getString("gameName"), game);
+                    }
+                    return null;
+                }
+            }
+        } catch (SQLException exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 
     public GameData[] getGameList() throws DataAccessException {
-        return null;
+        Collection<GameData> gameList = new ArrayList<>();
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var preparedStatement = connection.prepareStatement("SELECT * FROM GameData")) {
+                try (var response = preparedStatement.executeQuery()) {
+                    Gson gson = new Gson();
+                    while (response.next()) {
+                        ChessGame game = gson.fromJson(response.getString("game"), ChessGame.class);
+                        gameList.add(new GameData(response.getInt("id"), response.getString("whiteUsername"), response.getString("blackUsername"), response.getString("gameName"), game));
+                    }
+                    return gameList.toArray(new GameData[gameList.size()]);
+                }
+            }
+        } catch (SQLException exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 
     public void updateGame(GameData game) throws DataAccessException {
