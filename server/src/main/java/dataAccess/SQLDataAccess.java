@@ -19,16 +19,18 @@ public class SQLDataAccess implements DataAccess {
         configureDB();
     }
     public void createUser(UserData data) throws DataAccessException{
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String hashedPassword = encoder.encode(data.password());
         try (var connection = DatabaseManager.getConnection()) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String hashedPassword = encoder.encode(data.password());
             var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
             try (var preparedStatement = connection.prepareStatement(statement)) {
                 preparedStatement.setString(1, data.username());
                 preparedStatement.setString(2, hashedPassword);
                 preparedStatement.setString(3, data.email());
+
+                preparedStatement.executeUpdate();
             }
-        } catch (SQLException exception) {
+        } catch (Exception exception) {
             throw new DataAccessException(exception.getMessage());
         }
     }
@@ -50,9 +52,9 @@ public class SQLDataAccess implements DataAccess {
     }
 
     public String createAuthentication(String username) throws DataAccessException {
-        String authToken = UUID.randomUUID().toString();
         try (var connection = DatabaseManager.getConnection()) {
             try (var preparedStatement = connection.prepareStatement("INSERT INTO AuthData (authToken, username) VALUES (?, ?)")) {
+                String authToken = UUID.randomUUID().toString();
                 preparedStatement.setString(1, authToken);
                 preparedStatement.setString(2, username);
                 preparedStatement.executeUpdate();
@@ -194,7 +196,6 @@ public class SQLDataAccess implements DataAccess {
                     preparedStatement.executeUpdate();
                 }
             }
-            System.out.print("DATABASE CONFIGURED");
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to configure database: %s",ex.getMessage()));
         }
