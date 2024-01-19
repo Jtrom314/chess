@@ -172,6 +172,31 @@ public class SQLDataAccessTest {
         assertEquals(0, actual.length);
     }
 
+    @Test
+    void updateGameUpdatesGameSuccessfully () throws Exception {
+        DataAccess dataAccess = getDataAccess();
+
+        GameData gameData = new GameData(0, null, null, "Test1", new ChessGame());
+        int gameID = dataAccess.createGame(gameData);
+        GameData updatedGame = new GameData(gameID, "TEST", "TEST", "Test1", gameData.game());
+        dataAccess.updateGame(updatedGame);
+        GameData actual = dataAccess.getGameById(gameID);
+
+        assertEquals(updatedGame, actual);
+    }
+
+    @Test
+    void updateGameThrowsException () throws Exception {
+        DataAccess dataAccess = getDataAccess();
+
+        GameData gameData = new GameData(0, null, null, "Test1", new ChessGame());
+        int gameID = dataAccess.createGame(gameData);
+        GameData updatedGame = new GameData(gameID, "TEST", "TEST", "Test1", null);
+
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> dataAccess.updateGame(updatedGame));
+        assertFalse(exception.getMessage().isEmpty());
+    }
+
     public static void assertGameListEqual(GameData[] expected, GameData[] actual) {
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {

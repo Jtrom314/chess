@@ -157,7 +157,22 @@ public class SQLDataAccess implements DataAccess {
     }
 
     public void updateGame(GameData game) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            try (var preparedStatement = connection.prepareStatement("UPDATE GameData SET whiteUsername = ?, blackUsername = ?, game = ? WHERE id = ?")) {
+                if (game.game() == null) {
+                    throw new Exception("Game cannot be null");
+                }
+                Gson gson = new Gson();
+                preparedStatement.setString(1, game.whiteUsername());
+                preparedStatement.setString(2, game.blackUsername());
+                preparedStatement.setString(3, gson.toJson(game.game()));
+                preparedStatement.setInt(4, game.gameID());
 
+                preparedStatement.executeUpdate();
+            }
+        } catch (Exception exception) {
+            throw new DataAccessException(exception.getMessage());
+        }
     }
 
     public void clear() throws DataAccessException {
