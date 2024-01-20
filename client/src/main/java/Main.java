@@ -1,4 +1,5 @@
 import chess.*;
+import result.CreateGameResult;
 import result.LoginResult;
 
 import java.util.Scanner;
@@ -14,7 +15,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
         new Main().preLoginUI();
     }
-
 
     private static void clear () throws Exception {
         ServerFacade serverFacade = new ServerFacade();
@@ -40,7 +40,7 @@ public class Main {
         return true;
     }
 
-    public boolean login (String[] request) throws Exception{
+    public boolean login (String[] request) throws Exception {
         if (request.length != 3) {
             System.out.println("Incorrect number of arguments for login");
             return false;
@@ -70,6 +70,23 @@ public class Main {
         return false;
     }
 
+    public void createGame (String[] request) throws Exception {
+        if (request.length != 2) {
+            System.out.println("Incorrect number of arguments for create");
+            return;
+        }
+
+        ServerFacade serverFacade = new ServerFacade();
+        CreateGameResult response = serverFacade.createGame(getAuthToken(), request[1]);
+
+        if (response == null) {
+            System.out.println("Cannot create game");
+            return;
+        }
+
+        System.out.println(String.format("Created game id: %d", response.gameID()));
+    }
+
     public void postLoginUI () throws Exception {
         System.out.print(String.format("Logged in as: %s\n", getUsername()));
         while (true) {
@@ -87,7 +104,8 @@ public class Main {
                         return;
                     }
                     break;
-                case "Hello":
+                case "create":
+                    createGame(parsed);
                     break;
             }
 

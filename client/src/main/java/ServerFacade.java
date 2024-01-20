@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+import result.CreateGameResult;
 import result.LoginResult;
 
 import java.io.InputStream;
@@ -65,7 +66,7 @@ public class ServerFacade {
     }
 
     public boolean logout (String authToken) throws Exception {
-        URI uri = new URI("Http://localhost:8080/session");
+        URI uri = new URI("http://localhost:8080/session");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("DELETE");
 
@@ -79,6 +80,34 @@ public class ServerFacade {
 
         System.out.println("ERROR IN LOGGING OUT");
         return false;
+    }
+
+    public CreateGameResult createGame(String authToken, String gameName) throws Exception {
+        URI uri = new URI("http://localhost:8080/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("POST");
+
+        http.setDoOutput(true);
+        http.addRequestProperty("authorization", authToken);
+        http.addRequestProperty("Content-Type", "application/json");
+
+        http.connect();
+
+        var body = Map.of("gameName", gameName);
+        try (var outputStream = http.getOutputStream()) {
+            var jsonBody = new Gson().toJson(body);
+            outputStream.write(jsonBody.getBytes());
+        }
+
+        if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            try (InputStream response = http.getInputStream()) {
+                InputStreamReader inputStreamReader = new InputStreamReader(response);
+                return new Gson().fromJson(inputStreamReader, CreateGameResult.class);
+            }
+        }
+
+        System.out.println("ERROR");
+        return null;
     }
 
     public void clear () throws Exception {
