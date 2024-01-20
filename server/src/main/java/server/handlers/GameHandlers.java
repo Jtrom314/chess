@@ -61,6 +61,6 @@ public class GameHandlers {
         } catch (ResponseException exception) {
             throw new ResponseException(exception.statusCode(), exception.getMessage());
         }
-        return null;
+        return gson.toJson(new Object());
     }
 }

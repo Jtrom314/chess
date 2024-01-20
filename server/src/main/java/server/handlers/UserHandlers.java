@@ -51,6 +51,7 @@ public class UserHandlers {
         } catch (ResponseException exception) {
             throw new ResponseException(exception.statusCode(), exception.getMessage());
         }
-        return null;
+        Gson gson = new Gson();
+        return gson.toJson(new Object());
     }
 }

@@ -29,10 +29,7 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
-        var x = Server.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-       var webDir = Paths.get(x, "web");
-        //var webDir = "web";
-        Spark.externalStaticFileLocation(webDir.toString());
+        Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", userHandlers::register);
@@ -52,5 +49,6 @@ public class Server {
 
     public void stop() {
         Spark.stop();
+        Spark.awaitStop();
     }
 }

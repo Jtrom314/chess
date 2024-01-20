@@ -20,7 +20,7 @@ public class RegisterService extends SharedService {
                 dataAccess.createUser(user);
                 return new RegisterResult(request.username(), authToken);
             } else {
-                throw new ResponseException(401, "unauthorized");
+                throw new ResponseException(403, "unauthorized");
             }
         } catch (DataAccessException exception) {
             throw new ResponseException(500, exception.getMessage());

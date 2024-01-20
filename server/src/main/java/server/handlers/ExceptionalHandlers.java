@@ -21,7 +21,9 @@ public class ExceptionalHandlers {
         } catch (ResponseException exception) {
             throw new ResponseException(exception.statusCode(), exception.getMessage());
         }
-        return null;
+        res.status(200);
+        Gson gson = new Gson();
+        return gson.toJson(new Object());
     }
 
     public Object handleException(ResponseException ex, Request req, Response res) {
