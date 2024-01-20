@@ -2,6 +2,7 @@ package server;
 
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
+import dataAccess.SQLDataAccess;
 import server.handlers.ExceptionalHandlers;
 import server.handlers.GameHandlers;
 import server.handlers.UserHandlers;
@@ -16,7 +17,7 @@ public class Server {
     private final ExceptionalHandlers exceptionalHandlers;
 
     public Server() {
-        DataAccess dataAccess = new MemoryDataAccess();
+        DataAccess dataAccess = getDataAccess();
         this.userHandlers = new UserHandlers(dataAccess);
         this.gameHandlers = new GameHandlers(dataAccess);
         this.exceptionalHandlers = new ExceptionalHandlers(dataAccess);
@@ -50,5 +51,13 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    private static DataAccess getDataAccess () {
+        try {
+            return new SQLDataAccess();
+        } catch (Exception exception) {
+            return null;
+        }
     }
 }
