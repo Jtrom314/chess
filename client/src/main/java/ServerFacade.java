@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import result.CreateGameResult;
+import result.ListGameResult;
 import result.LoginResult;
 
 import java.io.InputStream;
@@ -103,6 +104,26 @@ public class ServerFacade {
             try (InputStream response = http.getInputStream()) {
                 InputStreamReader inputStreamReader = new InputStreamReader(response);
                 return new Gson().fromJson(inputStreamReader, CreateGameResult.class);
+            }
+        }
+
+        System.out.println("ERROR");
+        return null;
+    }
+
+    public ListGameResult listGames(String authToken) throws Exception {
+        URI uri = new URI("http://localhost:8080/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("GET");
+
+        http.addRequestProperty("authorization", authToken);
+
+        http.connect();
+
+        if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            try (InputStream response = http.getInputStream()) {
+                InputStreamReader inputStreamReader = new InputStreamReader(response);
+                return new Gson().fromJson(inputStreamReader, ListGameResult.class);
             }
         }
 

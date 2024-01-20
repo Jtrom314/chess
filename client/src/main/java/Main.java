@@ -1,5 +1,7 @@
 import chess.*;
+import model.GameData;
 import result.CreateGameResult;
+import result.ListGameResult;
 import result.LoginResult;
 
 import java.util.Scanner;
@@ -87,6 +89,22 @@ public class Main {
         System.out.println(String.format("Created game id: %d", response.gameID()));
     }
 
+    public void listGames () throws Exception {
+        ServerFacade serverFacade = new ServerFacade();
+        ListGameResult result = serverFacade.listGames(getAuthToken());
+
+        if (result == null) {
+            return;
+        }
+
+        GameData[] allGames = result.games();
+        for (int i = 0; i < allGames.length; i++) {
+            String whiteUsername = allGames[i].whiteUsername() == null ? "Empty" : allGames[i].whiteUsername();
+            String blackUsername = allGames[i].blackUsername() == null ? "Empty" : allGames[i].blackUsername();
+            System.out.println(String.format("%d.\t Game: %s\t ID: %d\t White Player: %s\t Black Player: %s", (i + 1), allGames[i].gameName(), allGames[i].gameID(), whiteUsername, blackUsername));
+        }
+    }
+
     public void postLoginUI () throws Exception {
         System.out.print(String.format("Logged in as: %s\n", getUsername()));
         while (true) {
@@ -106,6 +124,9 @@ public class Main {
                     break;
                 case "create":
                     createGame(parsed);
+                    break;
+                case "list":
+                    listGames();
                     break;
             }
 
