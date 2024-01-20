@@ -40,7 +40,23 @@ public class Main {
         return true;
     }
 
-    private static boolean login (String[] request) {
+    public boolean login (String[] request) throws Exception{
+        if (request.length != 3) {
+            System.out.println("Incorrect number of arguments for login");
+            return false;
+        }
+
+        ServerFacade serverFacade = new ServerFacade();
+        LoginResult response = serverFacade.login(request[1], request[2]);
+
+        if (response == null) {
+            System.out.println("Unauthorized");
+            return false;
+        }
+
+        setUsername(response.username());
+        setAuthToken(response.authToken());
+
         return true;
     }
 
