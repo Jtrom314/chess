@@ -29,7 +29,7 @@ public class Main {
         ServerFacade serverFacade = new ServerFacade();
         LoginResult response =  serverFacade.register(request[1], request[2], request[3]);
 
-        if (response.username() == null) {
+        if (response == null) {
             System.out.println("User already taken");
             return false;
         }
@@ -44,7 +44,17 @@ public class Main {
         return true;
     }
 
-    public void postLoginUI () {
+    public boolean logout () throws Exception {
+        ServerFacade serverFacade = new ServerFacade();
+        if (serverFacade.logout(getAuthToken())) {
+            setAuthToken(null);
+            setUsername(null);
+            return true;
+        }
+        return false;
+    }
+
+    public void postLoginUI () throws Exception {
         System.out.print(String.format("Logged in as: %s\n", getUsername()));
         while (true) {
             System.out.print("[LOGGED IN] >>> ");
@@ -56,7 +66,13 @@ public class Main {
                 case "help":
                     printHelp(true);
                     break;
-
+                case "logout":
+                    if (logout()) {
+                        return;
+                    }
+                    break;
+                case "Hello":
+                    break;
             }
 
         }

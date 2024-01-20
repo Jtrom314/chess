@@ -10,7 +10,7 @@ import java.util.Map;
 public class ServerFacade {
 
     public ServerFacade () {}
-    public LoginResult register (String username, String password, String email) throws Exception{
+    public LoginResult register (String username, String password, String email) throws Exception {
         URI uri = new URI("http://localhost:8080/user");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("POST");
@@ -35,6 +35,23 @@ public class ServerFacade {
 
         System.out.println("ERROR");
         return null;
+    }
+
+    public boolean logout (String authToken) throws Exception {
+        URI uri = new URI("Http://localhost:8080/session");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("DELETE");
+
+        http.addRequestProperty("authorization", authToken);
+
+        http.connect();
+
+        if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            return true;
+        }
+
+        System.out.println("ERROR IN LOGGING OUT");
+        return false;
     }
 
     public void clear () throws Exception {
