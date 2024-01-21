@@ -146,4 +146,28 @@ public class ServerFacadeTests {
         assertFalse(exception2.getMessage().isEmpty());
     }
 
+    @Test
+    void observeGameAllowsToObserve () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        CreateGameResult result1 = facade.createGame(firstUser.authToken(), "Test1");
+        CreateGameResult result2 = facade.createGame(firstUser.authToken(), "Test2");
+
+        assertDoesNotThrow(() -> facade.observeGame(firstUser.authToken(), result1.gameID()));
+        assertDoesNotThrow(() -> facade.observeGame(firstUser.authToken(), result2.gameID()));
+    }
+
+    @Test
+    void observeGameThrowsUnauthorized () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        CreateGameResult result1 = facade.createGame(firstUser.authToken(), "Test1");
+        CreateGameResult result2 = facade.createGame(firstUser.authToken(), "Test2");
+
+        Exception exception1 = assertThrows(Exception.class, () -> facade.observeGame(firstUser.username(), result1.gameID()));
+        Exception exception2 = assertThrows(Exception.class, () -> facade.observeGame(firstUser.username(), result2.gameID()));
+
+        assertFalse(exception1.getMessage().isEmpty());
+        assertFalse(exception2.getMessage().isEmpty());
+    }
 }

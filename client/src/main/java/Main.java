@@ -130,16 +130,15 @@ public class Main {
         }
     }
 
-    public void observeGame (String[] request) throws Exception {
+    public void observeGame (String[] request) {
         if (request.length != 2) {
             System.out.println("Incorrect number of arguments for observe");
             return;
         }
 
         ServerFacade serverFacade = new ServerFacade();
-        boolean response = serverFacade.observeGame(getAuthToken(), Integer.parseInt(request[1]));
-
-        if (response) {
+        try {
+            serverFacade.observeGame(getAuthToken(), Integer.parseInt(request[1]));
             setCurrentGameID(Integer.parseInt(request[1]));
             ChessGame game = new ChessGame();
             ChessBoard board = new ChessBoard();
@@ -149,6 +148,9 @@ public class Main {
             printBlackPerspective(game);
             System.out.print("\n");
             printWhitePerspective(game);
+
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
         }
     }
 

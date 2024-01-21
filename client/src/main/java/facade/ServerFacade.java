@@ -148,7 +148,7 @@ public class ServerFacade {
         }
     }
 
-    public boolean observeGame(String authToken, int gameID) throws Exception {
+    public void observeGame(String authToken, int gameID) throws Exception {
         URI uri = new URI("http://localhost:8080/game");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("PUT");
@@ -163,12 +163,9 @@ public class ServerFacade {
             var jsonBody = new Gson().toJson(body);
             outputStream.write(jsonBody.getBytes());
         }
-        if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            return true;
+        if (http.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new Exception(http.getResponseMessage());
         }
-
-        System.out.println("ERROR");
-        return false;
     }
 
     public void clear () throws Exception {
