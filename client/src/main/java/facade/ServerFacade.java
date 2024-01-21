@@ -61,10 +61,9 @@ public class ServerFacade {
                 InputStreamReader inputStreamReader = new InputStreamReader(response);
                 return new Gson().fromJson(inputStreamReader, LoginResult.class);
             }
+        } else {
+            throw new Exception(http.getResponseMessage());
         }
-
-        System.out.println("ERROR");
-        return null;
     }
 
     public boolean logout (String authToken) throws Exception {

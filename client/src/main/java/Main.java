@@ -26,7 +26,7 @@ public class Main {
         ServerFacade serverFacade = new ServerFacade();
         serverFacade.clear();
     }
-    public boolean register (String[] request) throws Exception {
+    public boolean register (String[] request) {
         if (request.length != 4) {
             System.out.println("Incorrect number of arguments for register");
             return false;
@@ -44,24 +44,22 @@ public class Main {
         }
     }
 
-    public boolean login (String[] request) throws Exception {
+    public boolean login (String[] request) {
         if (request.length != 3) {
             System.out.println("Incorrect number of arguments for login");
             return false;
         }
 
         ServerFacade serverFacade = new ServerFacade();
-        LoginResult response = serverFacade.login(request[1], request[2]);
-
-        if (response == null) {
-            System.out.println("Unauthorized");
+        try {
+            LoginResult response = serverFacade.login(request[1], request[2]);
+            setUsername(response.username());
+            setAuthToken(response.authToken());
+            return true;
+        } catch (Exception exception) {
+            System.out.print(exception.getMessage());
             return false;
         }
-
-        setUsername(response.username());
-        setAuthToken(response.authToken());
-
-        return true;
     }
 
     public boolean logout () throws Exception {

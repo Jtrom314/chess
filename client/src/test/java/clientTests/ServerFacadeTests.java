@@ -32,7 +32,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void registerUser () throws Exception{
+    public void registerUser () throws Exception {
         LoginResult expected = new LoginResult("TEST", "RANDOM");
         LoginResult actual = facade.register("TEST", "TEST", "TEST");
 
@@ -45,6 +45,26 @@ public class ServerFacadeTests {
         LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
 
         Exception exception = assertThrows(Exception.class, () -> facade.register("TEST", "TEST", "RANDOM"));
+        assertFalse(exception.getMessage().isEmpty());
+    }
+
+    @Test
+    public void loginUserSuccessful () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        facade.logout(firstUser.authToken());
+
+        assertDoesNotThrow(() -> facade.login("TEST", "TEST"));
+    }
+
+    @Test
+    public void loginUserThrowsWithIncorrectPassword () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        facade.logout(firstUser.authToken());
+
+        Exception exception = assertThrows(Exception.class, () -> facade.login("TEST", "test"));
+        assertFalse(exception.getMessage().isEmpty());
     }
 
 }
