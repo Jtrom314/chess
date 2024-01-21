@@ -2,6 +2,7 @@ package clientTests;
 
 import facade.ServerFacade;
 import org.junit.jupiter.api.*;
+import result.LoginResult;
 import server.Server;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,6 +29,22 @@ public class ServerFacadeTests {
     @Test
     public void clear() {
         assertDoesNotThrow(() -> facade.clear());
+    }
+
+    @Test
+    public void registerUser () throws Exception{
+        LoginResult expected = new LoginResult("TEST", "RANDOM");
+        LoginResult actual = facade.register("TEST", "TEST", "TEST");
+
+        assertEquals(expected.username(), actual.username());
+        assertFalse(actual.authToken().isEmpty());
+    }
+
+    @Test
+    public void registerThrowsOnDuplicateUser () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        Exception exception = assertThrows(Exception.class, () -> facade.register("TEST", "TEST", "RANDOM"));
     }
 
 }

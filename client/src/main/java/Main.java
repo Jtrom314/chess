@@ -33,17 +33,15 @@ public class Main {
         }
 
         ServerFacade serverFacade = new ServerFacade();
-        LoginResult response =  serverFacade.register(request[1], request[2], request[3]);
-
-        if (response == null) {
-            System.out.println("User already taken");
+        try {
+            LoginResult response =  serverFacade.register(request[1], request[2], request[3]);
+            setUsername(response.username());
+            setAuthToken(response.authToken());
+            return true;
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
             return false;
         }
-
-        setUsername(response.username());
-        setAuthToken(response.authToken());
-
-        return true;
     }
 
     public boolean login (String[] request) throws Exception {
