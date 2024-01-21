@@ -1,3 +1,5 @@
+package facade;
+
 import com.google.gson.Gson;
 import result.CreateGameResult;
 import result.ListGameResult;
@@ -185,9 +187,9 @@ public class ServerFacade {
         http.connect();
 
         if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            System.out.println("DB CLEARED");
+            return;
         } else {
-            System.out.println("ERROR");
+            throw new Exception(http.getResponseMessage());
         }
     }
 }

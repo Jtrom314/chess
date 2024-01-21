@@ -1,10 +1,10 @@
 import chess.*;
+import facade.ServerFacade;
 import model.GameData;
 import result.CreateGameResult;
 import result.ListGameResult;
 import result.LoginResult;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
