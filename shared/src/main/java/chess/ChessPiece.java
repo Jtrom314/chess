@@ -606,6 +606,25 @@ public class ChessPiece {
         return validMoves;
     }
 
+    public String pieceTypeToString() {
+        switch (getPieceType()) {
+            case KING:
+                return "K";
+            case QUEEN:
+                return "Q";
+            case KNIGHT:
+                return "N";
+            case BISHOP:
+                return "B";
+            case ROOK:
+                return "R";
+            case PAWN:
+                return "P";
+            default:
+                return null;
+        }
+    }
+
 
     @Override
     public boolean equals(Object o) {

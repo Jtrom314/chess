@@ -37,8 +37,10 @@ public class JoinGameService extends SharedService {
                         return;
                     }
                     throw new ResponseException(403, "already taken");
-                default:
+                case "":
                     return;
+                default:
+                    throw new ResponseException(403, "not a valid color");
             }
         } catch (DataAccessException exception) {
             throw new ResponseException(500, exception.getMessage());
