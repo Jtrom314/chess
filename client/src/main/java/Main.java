@@ -62,14 +62,17 @@ public class Main {
         }
     }
 
-    public boolean logout () throws Exception {
+    public boolean logout () {
         ServerFacade serverFacade = new ServerFacade();
-        if (serverFacade.logout(getAuthToken())) {
+        try {
+            serverFacade.logout(getAuthToken());
             setAuthToken(null);
             setUsername(null);
             return true;
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            return false;
         }
-        return false;
     }
 
     public void createGame (String[] request) throws Exception {

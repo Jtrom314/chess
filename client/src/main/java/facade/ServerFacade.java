@@ -66,7 +66,7 @@ public class ServerFacade {
         }
     }
 
-    public boolean logout (String authToken) throws Exception {
+    public void logout (String authToken) throws Exception {
         URI uri = new URI("http://localhost:8080/session");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("DELETE");
@@ -76,11 +76,10 @@ public class ServerFacade {
         http.connect();
 
         if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            return true;
+            return;
+        } else {
+            throw new Exception(http.getResponseMessage());
         }
-
-        System.out.println("ERROR IN LOGGING OUT");
-        return false;
     }
 
     public CreateGameResult createGame(String authToken, String gameName) throws Exception {

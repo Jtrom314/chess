@@ -67,4 +67,19 @@ public class ServerFacadeTests {
         assertFalse(exception.getMessage().isEmpty());
     }
 
+    @Test
+    public void logoutSuccessful () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        assertDoesNotThrow(() -> facade.logout(firstUser.authToken()));
+    }
+
+    @Test
+    public void logoutThrowsUnauthorizedE () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        Exception exception = assertThrows(Exception.class, () -> facade.logout(firstUser.username()));
+        assertFalse(exception.getMessage().isEmpty());
+    }
+
 }
