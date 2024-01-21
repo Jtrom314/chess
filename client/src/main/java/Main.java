@@ -11,6 +11,7 @@ import static ui.EscapeSequences.*;
 public class Main {
     public String username;
     public String authToken;
+    public int currentGameID;
 
     public Main () {}
 
@@ -105,6 +106,34 @@ public class Main {
         }
     }
 
+    public void joinGame (String[] request) throws Exception {
+        if (request.length != 3) {
+            System.out.println("Incorrect number of arguments for join");
+            return;
+        }
+
+        ServerFacade serverFacade = new ServerFacade();
+        boolean response = serverFacade.joinGame(getAuthToken(), Integer.parseInt(request[1]), request[2]);
+
+        if (response) {
+            setCurrentGameID(Integer.parseInt(request[1]));
+        }
+    }
+
+    public void observeGame (String[] request) throws Exception {
+        if (request.length != 2) {
+            System.out.println("Incorrect number of arguments for observe");
+            return;
+        }
+
+        ServerFacade serverFacade = new ServerFacade();
+        boolean response = serverFacade.observeGame(getAuthToken(), Integer.parseInt(request[1]));
+
+        if (response) {
+            setCurrentGameID(Integer.parseInt(request[1]));
+        }
+    }
+
     public void postLoginUI () throws Exception {
         System.out.print(String.format("Logged in as: %s\n", getUsername()));
         while (true) {
@@ -127,6 +156,12 @@ public class Main {
                     break;
                 case "list":
                     listGames();
+                    break;
+                case "join":
+                    joinGame(parsed);
+                    break;
+                case "observe":
+                    observeGame(parsed);
                     break;
             }
 
@@ -176,6 +211,10 @@ public class Main {
         this.authToken = authToken;
     }
 
+    public void setCurrentGameID(int gameID) {
+        this.currentGameID = gameID;
+    }
+
     public String getUsername() {
         return this.username;
     }
@@ -183,6 +222,11 @@ public class Main {
     public String getAuthToken() {
         return this.authToken;
     }
+
+    public int getCurrentGameID() {
+        return this.currentGameID;
+    }
+
 
 
 

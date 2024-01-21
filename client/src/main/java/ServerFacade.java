@@ -131,6 +131,52 @@ public class ServerFacade {
         return null;
     }
 
+    public boolean joinGame(String authToken, int gameID, String playerColor) throws Exception {
+        URI uri = new URI("http://localhost:8080/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("PUT");
+
+        http.setDoOutput(true);
+        http.addRequestProperty("authorization", authToken);
+
+        http.connect();
+
+        var body = Map.of("playerColor", playerColor, "gameID", gameID);
+        try (var outputStream = http.getOutputStream()) {
+            var jsonBody = new Gson().toJson(body);
+            outputStream.write(jsonBody.getBytes());
+        }
+        if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            return true;
+        }
+
+        System.out.println("ERROR");
+        return false;
+    }
+
+    public boolean observeGame(String authToken, int gameID) throws Exception {
+        URI uri = new URI("http://localhost:8080/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("PUT");
+
+        http.setDoOutput(true);
+        http.addRequestProperty("authorization", authToken);
+
+        http.connect();
+
+        var body = Map.of("gameID", gameID);
+        try (var outputStream = http.getOutputStream()) {
+            var jsonBody = new Gson().toJson(body);
+            outputStream.write(jsonBody.getBytes());
+        }
+        if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            return true;
+        }
+
+        System.out.println("ERROR");
+        return false;
+    }
+
     public void clear () throws Exception {
         URI uri = new URI("http://localhost:8080/db");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
