@@ -106,16 +106,15 @@ public class Main {
         }
     }
 
-    public void joinGame (String[] request) throws Exception {
+    public void joinGame (String[] request) {
         if (request.length != 3) {
             System.out.println("Incorrect number of arguments for join");
             return;
         }
 
         ServerFacade serverFacade = new ServerFacade();
-        boolean response = serverFacade.joinGame(getAuthToken(), Integer.parseInt(request[1]), request[2]);
-
-        if (response) {
+        try {
+            serverFacade.joinGame(getAuthToken(), Integer.parseInt(request[1]), request[2]);
             setCurrentGameID(Integer.parseInt(request[1]));
             ChessGame game = new ChessGame();
             ChessBoard board = new ChessBoard();
@@ -125,6 +124,9 @@ public class Main {
             printBlackPerspective(game);
             System.out.print("\n");
             printWhitePerspective(game);
+
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
         }
     }
 

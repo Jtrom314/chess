@@ -2,6 +2,7 @@ package clientTests;
 
 import facade.ServerFacade;
 import org.junit.jupiter.api.*;
+import result.CreateGameResult;
 import result.ListGameResult;
 import result.LoginResult;
 import server.Server;
@@ -118,6 +119,31 @@ public class ServerFacadeTests {
 
         Exception exception = assertThrows(Exception.class, () -> facade.listGames(firstUser.username()));
         assertFalse(exception.getMessage().isEmpty());
+    }
+
+    @Test
+    void joinGameAllowsToJoin () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        CreateGameResult result1 = facade.createGame(firstUser.authToken(), "Test1");
+        CreateGameResult result2 = facade.createGame(firstUser.authToken(), "Test2");
+
+        assertDoesNotThrow(() -> facade.joinGame(firstUser.authToken(), result1.gameID(), "WHITE"));
+        assertDoesNotThrow(() -> facade.joinGame(firstUser.authToken(), result2.gameID(), "BLACK"));
+    }
+
+    @Test
+    void joinGameThrowsUnauthorized () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        CreateGameResult result1 = facade.createGame(firstUser.authToken(), "Test1");
+        CreateGameResult result2 = facade.createGame(firstUser.authToken(), "Test2");
+
+        Exception exception1 = assertThrows(Exception.class, () -> facade.joinGame(firstUser.username(), result1.gameID(), "WHITE"));
+        Exception exception2 = assertThrows(Exception.class, () -> facade.joinGame(firstUser.authToken(), result2.gameID(), "GRAY"));
+
+        assertFalse(exception1.getMessage().isEmpty());
+        assertFalse(exception2.getMessage().isEmpty());
     }
 
 }
