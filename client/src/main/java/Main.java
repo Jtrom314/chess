@@ -75,7 +75,7 @@ public class Main {
         }
     }
 
-    public void createGame (String[] request) throws Exception {
+    public void createGame (String[] request) {
         if (request.length != 2) {
             System.out.println("Incorrect number of arguments for create");
             return;
@@ -90,19 +90,19 @@ public class Main {
         }
     }
 
-    public void listGames () throws Exception {
+    public void listGames () {
         ServerFacade serverFacade = new ServerFacade();
-        ListGameResult result = serverFacade.listGames(getAuthToken());
+        try {
+            ListGameResult result = serverFacade.listGames(getAuthToken());
 
-        if (result == null) {
-            return;
-        }
-
-        GameData[] allGames = result.games();
-        for (int i = 0; i < allGames.length; i++) {
-            String whiteUsername = allGames[i].whiteUsername() == null ? "Empty" : allGames[i].whiteUsername();
-            String blackUsername = allGames[i].blackUsername() == null ? "Empty" : allGames[i].blackUsername();
-            System.out.println(String.format("%d.\t Game: %s\t ID: %d\t White Player: %s\t Black Player: %s", (i + 1), allGames[i].gameName(), allGames[i].gameID(), whiteUsername, blackUsername));
+            GameData[] allGames = result.games();
+            for (int i = 0; i < allGames.length; i++) {
+                String whiteUsername = allGames[i].whiteUsername() == null ? "Empty" : allGames[i].whiteUsername();
+                String blackUsername = allGames[i].blackUsername() == null ? "Empty" : allGames[i].blackUsername();
+                System.out.println(String.format("%d.\t Game: %s\t ID: %d\t White Player: %s\t Black Player: %s", (i + 1), allGames[i].gameName(), allGames[i].gameID(), whiteUsername, blackUsername));
+            }
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
         }
     }
 

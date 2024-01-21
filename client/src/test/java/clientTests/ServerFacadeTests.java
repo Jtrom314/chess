@@ -2,6 +2,7 @@ package clientTests;
 
 import facade.ServerFacade;
 import org.junit.jupiter.api.*;
+import result.ListGameResult;
 import result.LoginResult;
 import server.Server;
 
@@ -94,6 +95,29 @@ public class ServerFacadeTests {
         LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
 
         Exception exception = assertThrows(Exception.class, () -> facade.createGame(firstUser.username(), "NO GOOD"));
+        assertFalse(exception.getMessage().isEmpty());
+    }
+
+    @Test
+    public void listGamesReturnsAllGames () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        facade.createGame(firstUser.authToken(), "Test1");
+        facade.createGame(firstUser.authToken(), "Test2");
+
+        ListGameResult games = facade.listGames(firstUser.authToken());
+        assertEquals(2, games.games().length);
+    }
+
+    @Test
+    void listGamesThrowsUnauthorized () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        facade.createGame(firstUser.authToken(), "Test1");
+        facade.createGame(firstUser.authToken(), "Test2");
+
+        Exception exception = assertThrows(Exception.class, () -> facade.listGames(firstUser.username()));
+        assertFalse(exception.getMessage().isEmpty());
     }
 
 }
