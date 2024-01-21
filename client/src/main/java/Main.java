@@ -82,14 +82,12 @@ public class Main {
         }
 
         ServerFacade serverFacade = new ServerFacade();
-        CreateGameResult response = serverFacade.createGame(getAuthToken(), request[1]);
-
-        if (response == null) {
-            System.out.println("Cannot create game");
-            return;
+        try {
+            CreateGameResult response = serverFacade.createGame(getAuthToken(), request[1]);
+            System.out.println(String.format("Created game id: %d", response.gameID()));
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
         }
-
-        System.out.println(String.format("Created game id: %d", response.gameID()));
     }
 
     public void listGames () throws Exception {

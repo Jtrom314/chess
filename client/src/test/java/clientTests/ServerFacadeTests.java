@@ -75,11 +75,25 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void logoutThrowsUnauthorizedE () throws Exception {
+    public void logoutThrowsUnauthorized () throws Exception {
         LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
 
         Exception exception = assertThrows(Exception.class, () -> facade.logout(firstUser.username()));
         assertFalse(exception.getMessage().isEmpty());
+    }
+
+    @Test
+    public void createGameSuccessful () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        assertDoesNotThrow(() -> facade.createGame(firstUser.authToken(), "TEST"));
+    }
+
+    @Test
+    public void createGameThrowsUnauthorized () throws Exception {
+        LoginResult firstUser = facade.register("TEST", "TEST", "TEST");
+
+        Exception exception = assertThrows(Exception.class, () -> facade.createGame(firstUser.username(), "NO GOOD"));
     }
 
 }

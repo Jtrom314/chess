@@ -104,10 +104,9 @@ public class ServerFacade {
                 InputStreamReader inputStreamReader = new InputStreamReader(response);
                 return new Gson().fromJson(inputStreamReader, CreateGameResult.class);
             }
+        } else {
+            throw new Exception(http.getResponseMessage());
         }
-
-        System.out.println("ERROR");
-        return null;
     }
 
     public ListGameResult listGames(String authToken) throws Exception {
