@@ -13,6 +13,7 @@ public class Main {
     public String username;
     public String authToken;
     public int currentGameID;
+    GameData[] gameList;
 
     public Main () {}
 
@@ -101,6 +102,7 @@ public class Main {
                 String blackUsername = allGames[i].blackUsername() == null ? "Empty" : allGames[i].blackUsername();
                 System.out.println(String.format("%d.\t Game: %s\t ID: %d\t White Player: %s\t Black Player: %s", (i + 1), allGames[i].gameName(), allGames[i].gameID(), whiteUsername, blackUsername));
             }
+            gameList = allGames;
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
         }
@@ -112,10 +114,19 @@ public class Main {
             return;
         }
 
+        int gameID;
+        try {
+            int gameIndex = Integer.parseInt(request[1]);
+            GameData game = gameList[gameIndex -1];
+            gameID = game.gameID();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         ServerFacade serverFacade = new ServerFacade();
         try {
-            serverFacade.joinGame(getAuthToken(), Integer.parseInt(request[1]), request[2]);
-            setCurrentGameID(Integer.parseInt(request[1]));
+            serverFacade.joinGame(getAuthToken(), gameID, request[2]);
+            setCurrentGameID(gameID);
             ChessGame game = new ChessGame();
             ChessBoard board = new ChessBoard();
             board.resetBoard();
