@@ -13,8 +13,8 @@ public class ServerFacadeTests {
     private static Server server;
     public static ServerFacade facade;
 
-    @BeforeAll
-    public static void init() throws Exception {
+    @BeforeEach
+    public void init() throws Exception {
         server = new Server();
         var port = server.run(8080);
         System.out.println("Started test HTTP server on " + port);
@@ -22,8 +22,8 @@ public class ServerFacadeTests {
         facade.clear();
     }
 
-    @AfterAll
-    static void stopServer() {
+    @AfterEach
+    void stopServer() {
         server.stop();
     }
 
