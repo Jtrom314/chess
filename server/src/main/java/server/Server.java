@@ -6,6 +6,7 @@ import dataAccess.SQLDataAccess;
 import server.handlers.ExceptionalHandlers;
 import server.handlers.GameHandlers;
 import server.handlers.UserHandlers;
+import server.websocket.WebsocketHandler;
 import spark.*;
 
 import java.nio.file.Paths;
@@ -15,12 +16,14 @@ public class Server {
     private final UserHandlers userHandlers;
     private final GameHandlers gameHandlers;
     private final ExceptionalHandlers exceptionalHandlers;
+    private final WebsocketHandler websocketHandler;
 
     public Server() {
         DataAccess dataAccess = getDataAccess();
         this.userHandlers = new UserHandlers(dataAccess);
         this.gameHandlers = new GameHandlers(dataAccess);
         this.exceptionalHandlers = new ExceptionalHandlers(dataAccess);
+        this.websocketHandler = new WebsocketHandler();
     }
 
     public static void main(String[] args) {
@@ -33,6 +36,8 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.webSocket("/connect", websocketHandler);
+
         Spark.post("/user", userHandlers::register);
         Spark.post("/session", userHandlers::login);
         Spark.delete("/session", userHandlers::logout);
