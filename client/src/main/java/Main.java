@@ -6,6 +6,7 @@ import result.CreateGameResult;
 import result.ListGameResult;
 import result.LoginResult;
 
+import java.util.Locale;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -190,6 +191,95 @@ public class Main {
         }
     }
 
+    public void makeMove(String[] parsed) {
+        String userMove = parsed[2];
+        userMove = userMove.toLowerCase(Locale.ROOT);
+
+        if (userMove.length() < 4) {
+            System.out.println("Incorrect number of characters in move request");
+            return;
+        }
+
+        String startingPostitionString = userMove.substring(0, 2);
+        String endingPostitionString = userMove.substring(2, 4);
+
+        System.out.printf("SPS: %s\n", startingPostitionString);
+        System.out.printf("EPS: %s\n", endingPostitionString);
+
+        ChessPosition startingPosition;
+        ChessPosition endingPosition;
+
+        ChessPiece.PieceType promotion = null;
+        if (parsed.length == 4) {
+            switch (parsed[3]) {
+                case "QUEEN":
+                    promotion = ChessPiece.PieceType.QUEEN;
+                    break;
+                case "BISHOP":
+                    promotion = ChessPiece.PieceType.BISHOP;
+                    break;
+                case "ROOK":
+                    promotion = ChessPiece.PieceType.ROOK;
+                    break;
+                case "KNIGHT":
+                    promotion = ChessPiece.PieceType.KNIGHT;
+                    break;
+                default:
+                    promotion = null;
+                    break;
+            }
+        }
+
+        try {
+            startingPosition = getPositionByString(startingPostitionString);
+            endingPosition = getPositionByString(endingPostitionString);
+        } catch (Exception exception) {
+            System.out.println("Could not convert position to move");
+            return;
+        }
+
+        ChessMove move = new ChessMove(startingPosition, endingPosition, promotion);
+    }
+
+    public ChessPosition getPositionByString(String stringPosition) throws Exception {
+        String letter = stringPosition.substring(0,1);
+        String number = stringPosition.substring(1,2);
+
+        int row = Integer.parseInt(number);
+        int col = 0;
+
+        switch (letter) {
+            case "a":
+                col = 1;
+                break;
+            case "b":
+                col = 2;
+                break;
+            case "c":
+                col = 3;
+                break;
+            case "d":
+                col = 4;
+                break;
+            case "e":
+                col = 5;
+                break;
+            case "f":
+                col = 6;
+                break;
+            case "g":
+                col = 7;
+                break;
+            case "h":
+                col = 8;
+                break;
+            default:
+                throw new Exception();
+        }
+
+        return new ChessPosition(row, col);
+    }
+
     public void gameplayUI () throws Exception {
         while (true) {
             System.out.print("[GAMEPLAY] >>> ");
@@ -206,14 +296,14 @@ public class Main {
                     break;
                 case "leave":
                     return;
-                    break;
                 case "make":
                     makeMove(parsed);
                     break;
                 case "resign":
-                    resign();
+                    //resign();
+                    break;
                 case "highlight":
-                    highlight(parsed);
+                    //highlight(parsed);
                     break;
             }
         }
@@ -592,7 +682,7 @@ public class Main {
 
                 if (getCurrentTeamColor() != null) {
                     System.out.print(SET_TEXT_COLOR_BLUE);
-                    System.out.print("make move <move>");
+                    System.out.print("make move <move> [promotion]");
                     System.out.print(SET_TEXT_COLOR_WHITE);
                     System.out.print(" - make a chess move\n");
 
