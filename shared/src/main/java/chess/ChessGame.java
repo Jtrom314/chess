@@ -113,9 +113,6 @@ public class ChessGame {
             throw new InvalidMoveException("Piece cannot move there either because it leaves the king in danger or move does not exist");
         }
 
-        //TODO: finish this function
-        // Make the actual move
-
         if (move.getPromotionPiece() != null) {
             current_piece.setPieceType(move.getPromotionPiece());
         }

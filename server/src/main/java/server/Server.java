@@ -3,6 +3,7 @@ package server;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
 import dataAccess.SQLDataAccess;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import server.handlers.ExceptionalHandlers;
 import server.handlers.GameHandlers;
 import server.handlers.UserHandlers;
@@ -17,6 +18,7 @@ public class Server {
     private final GameHandlers gameHandlers;
     private final ExceptionalHandlers exceptionalHandlers;
     private final WebsocketHandler websocketHandler;
+
 
     public Server() {
         DataAccess dataAccess = getDataAccess();

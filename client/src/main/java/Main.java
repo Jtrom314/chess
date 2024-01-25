@@ -1,5 +1,6 @@
 import chess.*;
 import facade.ServerFacade;
+import facade.WebsocketFacade;
 import model.GameData;
 import result.CreateGameResult;
 import result.ListGameResult;
@@ -13,9 +14,21 @@ public class Main {
     public String username;
     public String authToken;
     public int currentGameID;
+    ChessGame.TeamColor currentTeamColor;
     GameData[] gameList;
+    ChessGame currentGame;
+    WebsocketFacade ws;
 
-    public Main () {}
+    public enum STATE {
+        LOGGED_OUT,
+        LOGGED_IN,
+        GAMEPLAY
+    }
+
+    public Main () throws Exception{
+        this.ws = new WebsocketFacade();
+    }
+
 
     public static void main(String[] args) throws Exception {
         System.out.print(RESET_BG_COLOR);
@@ -135,7 +148,9 @@ public class Main {
             printBlackPerspective(game);
             System.out.print("\n");
             printWhitePerspective(game);
+            setCurrentTeamColor(request[2]);
 
+            gameplayUI();
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
         }
@@ -159,9 +174,48 @@ public class Main {
             printBlackPerspective(game);
             System.out.print("\n");
             printWhitePerspective(game);
+            setCurrentTeamColor(null);
 
+            gameplayUI();
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
+        }
+    }
+
+    public void redrawBoard () {
+        if (currentTeamColor == ChessGame.TeamColor.BLACK) {
+            printBlackPerspective(getCurrentGame());
+        } else {
+            printWhitePerspective(getCurrentGame());
+        }
+    }
+
+    public void gameplayUI () throws Exception {
+        while (true) {
+            System.out.print("[GAMEPLAY] >>> ");
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+            String[] parsed = line.split( " ");
+
+            switch (parsed[0]) {
+                case "help":
+                    printHelp(STATE.GAMEPLAY);
+                    break;
+                case "redraw":
+                    redrawBoard();
+                    break;
+                case "leave":
+                    return;
+                    break;
+                case "make":
+                    makeMove(parsed);
+                    break;
+                case "resign":
+                    resign();
+                case "highlight":
+                    highlight(parsed);
+                    break;
+            }
         }
     }
 
@@ -175,7 +229,7 @@ public class Main {
 
             switch (parsed[0]) {
                 case "help":
-                    printHelp(true);
+                    printHelp(STATE.LOGGED_IN);
                     break;
                 case "logout":
                     if (logout()) {
@@ -197,8 +251,6 @@ public class Main {
             }
 
         }
-
-
     }
 
     public void preLoginUI () throws Exception{
@@ -212,7 +264,7 @@ public class Main {
 
             switch (parsed[0]) {
                 case "help":
-                    printHelp(false);
+                    printHelp(STATE.LOGGED_OUT);
                     break;
                 case "register":
                     if (register(parsed)) {
@@ -245,6 +297,22 @@ public class Main {
     public void setCurrentGameID(int gameID) {
         this.currentGameID = gameID;
     }
+    public void setCurrentTeamColor(String color) {
+        switch (color) {
+            case "WHITE":
+                this.currentTeamColor = ChessGame.TeamColor.WHITE;
+                break;
+            case "BLACK":
+                this.currentTeamColor = ChessGame.TeamColor.BLACK;
+                break;
+            default:
+                this.currentTeamColor = null;
+        }
+    }
+
+    public void setCurrentGame(ChessGame game) {
+        this.currentGame = game;
+    }
 
     public String getUsername() {
         return this.username;
@@ -256,6 +324,14 @@ public class Main {
 
     public int getCurrentGameID() {
         return this.currentGameID;
+    }
+
+    public ChessGame.TeamColor getCurrentTeamColor() {
+        return this.currentTeamColor;
+    }
+
+    public ChessGame getCurrentGame () {
+        return this.currentGame;
     }
 
 
@@ -459,47 +535,77 @@ public class Main {
 
 
 
-    private static void printHelp(boolean isLoggedIn) {
-        if (isLoggedIn) {
-            System.out.print(SET_TEXT_COLOR_BLUE);
-            System.out.print("create <NAME>");
-            System.out.print(SET_TEXT_COLOR_WHITE);
-            System.out.print(" - to create a game\n");
+    private void printHelp(STATE current_state) {
+        switch (current_state) {
+            case LOGGED_OUT:
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("create <NAME>");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - to create a game\n");
 
-            System.out.print(SET_TEXT_COLOR_BLUE);
-            System.out.print("list");
-            System.out.print(SET_TEXT_COLOR_WHITE);
-            System.out.print(" - to list all games\n");
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("list");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - to list all games\n");
 
-            System.out.print(SET_TEXT_COLOR_BLUE);
-            System.out.print("join <ID> [WHITE|BLACK]");
-            System.out.print(SET_TEXT_COLOR_WHITE);
-            System.out.print(" - to join a game as a player\n");
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("join <ID> [WHITE|BLACK]");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - to join a game as a player\n");
 
-            System.out.print(SET_TEXT_COLOR_BLUE);
-            System.out.print("observe <ID>");
-            System.out.print(SET_TEXT_COLOR_WHITE);
-            System.out.print(" - to join a game as an observer\n");
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("observe <ID>");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - to join a game as an observer\n");
 
-            System.out.print(SET_TEXT_COLOR_BLUE);
-            System.out.print("logout");
-            System.out.print(SET_TEXT_COLOR_WHITE);
-            System.out.print(" - to quit playing\n");
-        } else {
-            System.out.print(SET_TEXT_COLOR_BLUE);
-            System.out.print("register <USERNAME> <PASSWORD> <EMAIL>");
-            System.out.print(SET_TEXT_COLOR_WHITE);
-            System.out.print(" - to create an account\n");
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("logout");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - to quit playing\n");
+                break;
+            case LOGGED_IN:
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("register <USERNAME> <PASSWORD> <EMAIL>");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - to create an account\n");
 
-            System.out.print(SET_TEXT_COLOR_BLUE);
-            System.out.print("login <USERNAME> <PASSWORD>");
-            System.out.print(SET_TEXT_COLOR_WHITE);
-            System.out.print(" - to play chess\n");
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("login <USERNAME> <PASSWORD>");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - to play chess\n");
 
-            System.out.print(SET_TEXT_COLOR_BLUE);
-            System.out.print("quit");
-            System.out.print(SET_TEXT_COLOR_WHITE);
-            System.out.print(" - to exit program\n");
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("quit");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - to exit program\n");
+                break;
+            case GAMEPLAY:
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("redraw");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - to redraw the current board\n");
+
+                System.out.print(SET_TEXT_COLOR_BLUE);
+                System.out.print("leave");
+                System.out.print(SET_TEXT_COLOR_WHITE);
+                System.out.print(" - leave the game\n");
+
+                if (getCurrentTeamColor() != null) {
+                    System.out.print(SET_TEXT_COLOR_BLUE);
+                    System.out.print("make move <move>");
+                    System.out.print(SET_TEXT_COLOR_WHITE);
+                    System.out.print(" - make a chess move\n");
+
+                    System.out.print(SET_TEXT_COLOR_BLUE);
+                    System.out.print("resign");
+                    System.out.print(SET_TEXT_COLOR_WHITE);
+                    System.out.print(" - resign the game\n");
+
+                    System.out.print(SET_TEXT_COLOR_BLUE);
+                    System.out.print("highlight <position>");
+                    System.out.print(SET_TEXT_COLOR_WHITE);
+                    System.out.print(" - highlight all legal moves for selected piece\n");
+                }
         }
         System.out.print(SET_TEXT_COLOR_BLUE);
         System.out.print("help");
