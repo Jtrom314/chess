@@ -5,8 +5,11 @@ import model.GameData;
 import result.CreateGameResult;
 import result.ListGameResult;
 import result.LoginResult;
+import ui.BoardUI;
+import ui.BoardUI.STATE;
 
-import java.util.Locale;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -19,12 +22,8 @@ public class Main {
     GameData[] gameList;
     ChessGame currentGame;
     WebsocketFacade ws;
+    BoardUI boardUI = new BoardUI();
 
-    public enum STATE {
-        LOGGED_OUT,
-        LOGGED_IN,
-        GAMEPLAY
-    }
 
     public Main () throws Exception{
         this.ws = new WebsocketFacade();
@@ -146,10 +145,12 @@ public class Main {
             board.resetBoard();
             game.setBoard(board);
 
-            printBlackPerspective(game);
+            boardUI.printBlackPerspective(game, false, null, null);
             System.out.print("\n");
-            printWhitePerspective(game);
+            boardUI.printWhitePerspective(game, false, null, null);
             setCurrentTeamColor(request[2]);
+
+            setCurrentGame(game);
 
             gameplayUI();
         } catch (Exception exception) {
@@ -172,10 +173,12 @@ public class Main {
             board.resetBoard();
             game.setBoard(board);
 
-            printBlackPerspective(game);
+            boardUI.printBlackPerspective(game, false, null, null);
             System.out.print("\n");
-            printWhitePerspective(game);
+            boardUI.printWhitePerspective(game, false, null, null);
             setCurrentTeamColor(null);
+
+            setCurrentGame(game);
 
             gameplayUI();
         } catch (Exception exception) {
@@ -185,15 +188,15 @@ public class Main {
 
     public void redrawBoard () {
         if (currentTeamColor == ChessGame.TeamColor.BLACK) {
-            printBlackPerspective(getCurrentGame());
+            boardUI.printBlackPerspective(getCurrentGame(), false, null, null);
         } else {
-            printWhitePerspective(getCurrentGame());
+            boardUI.printWhitePerspective(getCurrentGame(), false, null, null);
         }
     }
 
     public void makeMove(String[] parsed) {
         String userMove = parsed[2];
-        userMove = userMove.toLowerCase(Locale.ROOT);
+        userMove = userMove.toLowerCase();
 
         if (userMove.length() < 4) {
             System.out.println("Incorrect number of characters in move request");
@@ -280,6 +283,42 @@ public class Main {
         return new ChessPosition(row, col);
     }
 
+    public void highlight(String[] parsed) {
+        if (parsed.length != 2) {
+            System.out.println("Incorrect number of arguments for highlight");
+            return;
+        }
+
+        String userPosition = parsed[1];
+        userPosition = userPosition.toLowerCase();
+        if (userPosition.length() != 2) {
+            System.out.println("Requested position is not a valid position");
+            return;
+        }
+
+        ChessPosition startingPosition;
+        try {
+            startingPosition = getPositionByString(userPosition);
+        } catch (Exception exception) {
+            System.out.println("Requested position is not a valid position");
+            return;
+        }
+
+        ChessGame currentGame = getCurrentGame();
+        Collection<ChessMove> validMoves = currentGame.validMoves(startingPosition);
+
+        if (validMoves == null) {
+            validMoves = new HashSet<>();
+
+        }
+
+        if (getCurrentTeamColor() == ChessGame.TeamColor.BLACK) {
+            boardUI.printBlackPerspective(getCurrentGame(), true, startingPosition, validMoves);
+        } else {
+            boardUI.printWhitePerspective(getCurrentGame(), true, startingPosition, validMoves);
+        }
+    }
+
     public void gameplayUI () throws Exception {
         while (true) {
             System.out.print("[GAMEPLAY] >>> ");
@@ -289,7 +328,7 @@ public class Main {
 
             switch (parsed[0]) {
                 case "help":
-                    printHelp(STATE.GAMEPLAY);
+                    boardUI.printHelp(STATE.GAMEPLAY);
                     break;
                 case "redraw":
                     redrawBoard();
@@ -303,7 +342,7 @@ public class Main {
                     //resign();
                     break;
                 case "highlight":
-                    //highlight(parsed);
+                    highlight(parsed);
                     break;
             }
         }
@@ -319,7 +358,7 @@ public class Main {
 
             switch (parsed[0]) {
                 case "help":
-                    printHelp(STATE.LOGGED_IN);
+                    boardUI.printHelp(STATE.LOGGED_IN);
                     break;
                 case "logout":
                     if (logout()) {
@@ -354,7 +393,7 @@ public class Main {
 
             switch (parsed[0]) {
                 case "help":
-                    printHelp(STATE.LOGGED_OUT);
+                    boardUI.printHelp(STATE.LOGGED_OUT);
                     break;
                 case "register":
                     if (register(parsed)) {
@@ -422,284 +461,5 @@ public class Main {
 
     public ChessGame getCurrentGame () {
         return this.currentGame;
-    }
-
-
-    public static void printWhitePerspective (ChessGame game) {
-        ChessBoard board = game.getBoard();
-        int finalSize = 10;
-
-        String[] col = {"", "A", "B", "C", "D", "E", "F", "G", "H", ""};
-        String[] row = {"", "8", "7", "6", "5", "4", "3", "2", "1", ""};
-
-
-        for (int i = 0; i < finalSize; i ++) {
-            System.out.print(SET_BG_COLOR_LIGHT_GREY);
-            System.out.print(SET_TEXT_BOLD);
-            System.out.print(SET_TEXT_COLOR_BLACK);
-            for (int j = 0; j < finalSize; j++) {
-                if (i == 0 || i == finalSize - 1) {
-                    if (j == 0 || j == finalSize -1) {
-                        System.out.print("   ");
-                    } else {
-                        System.out.printf(" %s ", col[j]);
-                    }
-                } else if (i % 2 == 0) {
-                    if (j > 0 && j < finalSize - 1) {
-                        ChessPosition currentPosition = new ChessPosition(9 - i, j);
-                        ChessPiece currentPiece = board.getPiece(currentPosition);
-                        if (j % 2 == 0) {
-                            System.out.print(SET_BG_COLOR_WHITE);
-                            System.out.print(SET_TEXT_COLOR_BLACK);
-                            if (currentPiece == null) {
-                                System.out.print("   ");
-                            } else {
-                                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                                    System.out.print(SET_TEXT_COLOR_RED);
-                                } else {
-                                    System.out.print(SET_TEXT_COLOR_BLUE);
-                                }
-                                System.out.printf(" %s ", currentPiece.pieceTypeToString());
-                            }
-                        } else {
-                            System.out.print(SET_BG_COLOR_BLACK);
-                            System.out.print(SET_TEXT_COLOR_BLACK);
-                            if (currentPiece == null) {
-                                System.out.print("   ");
-                            } else {
-                                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                                    System.out.print(SET_TEXT_COLOR_RED);
-                                } else {
-                                    System.out.print(SET_TEXT_COLOR_BLUE);
-                                }
-                                System.out.printf(" %s ", currentPiece.pieceTypeToString());
-                            }
-                        }
-                    } else {
-                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                        System.out.print(SET_TEXT_COLOR_BLACK);
-                        System.out.printf(" %s ", row[i]);
-                    }
-                } else {
-                    if (j > 0 && j < finalSize - 1) {
-                        ChessPosition currentPosition = new ChessPosition(9 - i, j);
-                        ChessPiece currentPiece = board.getPiece(currentPosition);
-                        if (j % 2 == 0) {
-                            System.out.print(SET_BG_COLOR_BLACK);
-                            System.out.print(SET_TEXT_COLOR_BLACK);
-                            if (currentPiece == null) {
-                                System.out.print("   ");
-                            } else {
-                                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                                    System.out.print(SET_TEXT_COLOR_RED);
-                                } else {
-                                    System.out.print(SET_TEXT_COLOR_BLUE);
-                                }
-                                System.out.printf(" %s ", currentPiece.pieceTypeToString());
-                            }
-                        } else {
-                            System.out.print(SET_BG_COLOR_WHITE);
-                            System.out.print(SET_TEXT_COLOR_BLACK);
-                            if (currentPiece == null) {
-                                System.out.print("   ");
-                            } else {
-                                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                                    System.out.print(SET_TEXT_COLOR_RED);
-                                } else {
-                                    System.out.print(SET_TEXT_COLOR_BLUE);
-                                }
-                                System.out.printf(" %s ", currentPiece.pieceTypeToString());
-                            }
-                        }
-                    } else {
-                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                        System.out.print(SET_TEXT_COLOR_BLACK);
-                        System.out.printf(" %s ", row[i]);
-                    }
-                }
-            }
-            System.out.print("\n");
-        }
-        System.out.print(RESET_BG_COLOR);
-        System.out.print(SET_TEXT_COLOR_WHITE);
-    }
-
-    public static void printBlackPerspective (ChessGame game) {
-        ChessBoard board = game.getBoard();
-        int finalSize = 10;
-
-        String[] col = {"", "H", "G", "F", "E", "D", "C", "B", "A", ""};
-        String[] row = {"", "1", "2", "3", "4", "5", "6", "7", "8", ""};
-
-
-        for (int i = 0; i < finalSize; i ++) {
-            System.out.print(SET_BG_COLOR_LIGHT_GREY);
-            System.out.print(SET_TEXT_BOLD);
-            System.out.print(SET_TEXT_COLOR_BLACK);
-            for (int j = 0; j < finalSize; j++) {
-                if (i == 0 || i == finalSize - 1) {
-                    if (j == 0 || j == finalSize -1) {
-                        System.out.print("   ");
-                    } else {
-                        System.out.printf(" %s ", col[j]);
-                    }
-                } else if (i % 2 == 0) {
-                    if (j > 0 && j < finalSize - 1) {
-                        ChessPosition currentPosition = new ChessPosition(i, 9 -j);
-                        ChessPiece currentPiece = board.getPiece(currentPosition);
-                        if (j % 2 == 0) {
-                            System.out.print(SET_BG_COLOR_WHITE);
-                            System.out.print(SET_TEXT_COLOR_BLACK);
-                            if (currentPiece == null) {
-                                System.out.print("   ");
-                            } else {
-                                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                                    System.out.print(SET_TEXT_COLOR_RED);
-                                } else {
-                                    System.out.print(SET_TEXT_COLOR_BLUE);
-                                }
-                                System.out.printf(" %s ", currentPiece.pieceTypeToString());
-                            }
-                        } else {
-                            System.out.print(SET_BG_COLOR_BLACK);
-                            System.out.print(SET_TEXT_COLOR_BLACK);
-                            if (currentPiece == null) {
-                                System.out.print("   ");
-                            } else {
-                                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                                    System.out.print(SET_TEXT_COLOR_RED);
-                                } else {
-                                    System.out.print(SET_TEXT_COLOR_BLUE);
-                                }
-                                System.out.printf(" %s ", currentPiece.pieceTypeToString());
-                            }
-                        }
-                    } else {
-                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                        System.out.print(SET_TEXT_COLOR_BLACK);
-                        System.out.printf(" %s ", row[i]);
-                    }
-                } else {
-                    if (j > 0 && j < finalSize - 1) {
-                        ChessPosition currentPosition = new ChessPosition(i, 9 - j);
-                        ChessPiece currentPiece = board.getPiece(currentPosition);
-                        if (j % 2 == 0) {
-                            System.out.print(SET_BG_COLOR_BLACK);
-                            System.out.print(SET_TEXT_COLOR_BLACK);
-                            if (currentPiece == null) {
-                                System.out.print("   ");
-                            } else {
-                                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                                    System.out.print(SET_TEXT_COLOR_RED);
-                                } else {
-                                    System.out.print(SET_TEXT_COLOR_BLUE);
-                                }
-                                System.out.printf(" %s ", currentPiece.pieceTypeToString());
-                            }
-                        } else {
-                            System.out.print(SET_BG_COLOR_WHITE);
-                            System.out.print(SET_TEXT_COLOR_BLACK);
-                            if (currentPiece == null) {
-                                System.out.print("   ");
-                            } else {
-                                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                                    System.out.print(SET_TEXT_COLOR_RED);
-                                } else {
-                                    System.out.print(SET_TEXT_COLOR_BLUE);
-                                }
-                                System.out.printf(" %s ", currentPiece.pieceTypeToString());
-                            }
-                        }
-                    } else {
-                        System.out.print(SET_BG_COLOR_LIGHT_GREY);
-                        System.out.print(SET_TEXT_COLOR_BLACK);
-                        System.out.printf(" %s ", row[i]);
-                    }
-                }
-            }
-            System.out.print("\n");
-        }
-        System.out.print(RESET_BG_COLOR);
-        System.out.print(SET_TEXT_COLOR_WHITE);
-    }
-
-
-
-    private void printHelp(STATE current_state) {
-        switch (current_state) {
-            case LOGGED_OUT:
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("create <NAME>");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - to create a game\n");
-
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("list");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - to list all games\n");
-
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("join <ID> [WHITE|BLACK]");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - to join a game as a player\n");
-
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("observe <ID>");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - to join a game as an observer\n");
-
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("logout");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - to quit playing\n");
-                break;
-            case LOGGED_IN:
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("register <USERNAME> <PASSWORD> <EMAIL>");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - to create an account\n");
-
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("login <USERNAME> <PASSWORD>");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - to play chess\n");
-
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("quit");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - to exit program\n");
-                break;
-            case GAMEPLAY:
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("redraw");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - to redraw the current board\n");
-
-                System.out.print(SET_TEXT_COLOR_BLUE);
-                System.out.print("leave");
-                System.out.print(SET_TEXT_COLOR_WHITE);
-                System.out.print(" - leave the game\n");
-
-                if (getCurrentTeamColor() != null) {
-                    System.out.print(SET_TEXT_COLOR_BLUE);
-                    System.out.print("make move <move> [promotion]");
-                    System.out.print(SET_TEXT_COLOR_WHITE);
-                    System.out.print(" - make a chess move\n");
-
-                    System.out.print(SET_TEXT_COLOR_BLUE);
-                    System.out.print("resign");
-                    System.out.print(SET_TEXT_COLOR_WHITE);
-                    System.out.print(" - resign the game\n");
-
-                    System.out.print(SET_TEXT_COLOR_BLUE);
-                    System.out.print("highlight <position>");
-                    System.out.print(SET_TEXT_COLOR_WHITE);
-                    System.out.print(" - highlight all legal moves for selected piece\n");
-                }
-        }
-        System.out.print(SET_TEXT_COLOR_BLUE);
-        System.out.print("help");
-        System.out.print(SET_TEXT_COLOR_WHITE);
-        System.out.print(" - to see possible commands\n");
     }
 }
