@@ -9,6 +9,7 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import org.eclipse.jetty.websocket.api.annotations.*;
 import server.websocket.methods.JoinManager;
+import server.websocket.methods.MoveManager;
 import server.websocket.methods.ObserveManager;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.UserGameCommand;
@@ -19,11 +20,13 @@ public class WebsocketHandler {
     ConnectionManager connections;
     JoinManager joinManager;
     ObserveManager observeManager;
+    MoveManager moveManager;
     public WebsocketHandler(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
         this.connections = new ConnectionManager(dataAccess);
         this.joinManager = new JoinManager(connections);
         this.observeManager = new ObserveManager(connections);
+        this.moveManager = new MoveManager(connections);
     }
 
     @OnWebSocketMessage
@@ -34,7 +37,7 @@ public class WebsocketHandler {
             switch (command.getCommandType()) {
                 case JOIN_PLAYER -> joinManager.join(connection, command);
                 case JOIN_OBSERVER -> observeManager.observe(connection, command);
-                case MAKE_MOVE -> move(connection, command);
+                case MAKE_MOVE -> moveManager.move(connection, command);
                 case LEAVE -> leave(connection, command);
                 case RESIGN -> resign(connection, command);
                 default -> throw new Exception();
@@ -45,7 +48,6 @@ public class WebsocketHandler {
             session.getRemote().sendString(new Gson().toJson(error));
         }
     }
-    public void move(Connection connection, UserGameCommand command) {}
     public void leave(Connection connection, UserGameCommand command) {}
 
     public void resign(Connection connection, UserGameCommand command) {}

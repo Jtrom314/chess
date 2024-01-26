@@ -14,8 +14,12 @@ public class ChessGame {
 
     private TeamColor current_team_color;
     private ChessBoard current_board;
+    private Boolean playerResigned = false;
+    private Boolean isInCheckmate = false;
+    private Boolean isInStalemate = false;
 
     public ChessGame() {
+        current_team_color = TeamColor.WHITE;
     }
 
     /**
@@ -94,23 +98,27 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (getIsInCheckMate() || getIsInStalemate() || getPlayerResigned()) {
+            throw new InvalidMoveException("GAME IS FINISHED");
+        }
+
         ChessPosition start_position = move.getStartPosition();
         ChessPosition end_position = move.getEndPosition();
 
         Collection<ChessMove> validMoves = validMoves(start_position);
         if (validMoves == null) {
-            throw new InvalidMoveException("No piece at the starting position");
+            throw new InvalidMoveException("NO PIECE AT STARTING POSITION");
         }
 
         TeamColor current_team_color = getTeamTurn();
         ChessPiece current_piece = getBoard().getPiece(start_position);
 
         if (current_piece.getTeamColor() != current_team_color) {
-            throw new InvalidMoveException("Incorrect team color");
+            throw new InvalidMoveException("CANNOT MOVE OPPOSITE TEAM'S PIECE");
         }
 
         if (!validMoves.contains(move)) {
-            throw new InvalidMoveException("Piece cannot move there either because it leaves the king in danger or move does not exist");
+            throw new InvalidMoveException("INVALID MOVE");
         }
 
         if (move.getPromotionPiece() != null) {
@@ -129,6 +137,9 @@ public class ChessGame {
         } else {
             setTeamTurn(TeamColor.WHITE);
         }
+
+        setIsInCheckmate(isInCheckmate(getTeamTurn()));
+        setIsInStalemate(isInStalemate(getTeamTurn()));
     }
 
     /**
@@ -283,6 +294,30 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.current_board;
+    }
+
+    public void setIsInCheckmate(Boolean isInCheckmate) {
+        this.isInCheckmate = isInCheckmate;
+    }
+
+    public void setIsInStalemate(Boolean isInStalemate) {
+        this.isInStalemate = isInStalemate;
+    }
+
+    public void setPlayerResigned(Boolean playerResigned) {
+        this.playerResigned = playerResigned;
+    }
+
+    public boolean getIsInCheckMate() {
+        return this.isInCheckmate;
+    }
+
+    public boolean getIsInStalemate() {
+        return this.isInStalemate;
+    }
+
+    public boolean getPlayerResigned() {
+        return this.playerResigned;
     }
 
     @Override
