@@ -25,7 +25,7 @@ public class Server {
         this.userHandlers = new UserHandlers(dataAccess);
         this.gameHandlers = new GameHandlers(dataAccess);
         this.exceptionalHandlers = new ExceptionalHandlers(dataAccess);
-        this.websocketHandler = new WebsocketHandler();
+        this.websocketHandler = new WebsocketHandler(dataAccess);
     }
 
     public static void main(String[] args) {

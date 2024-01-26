@@ -319,6 +319,27 @@ public class Main {
         }
     }
 
+    public void resign() {
+        while (true) {
+            System.out.println("[DO YOU REALLY WANT TO RESIGN? (Y/N)] >>> ");
+            Scanner scanner = new Scanner(System.in);
+            String word = scanner.next();
+            switch (word) {
+                case "Y":
+                case "y":
+                    return;
+                case "N":
+                case "n":
+                    return;
+                default:
+            }
+        }
+    }
+
+    public void leave() {
+        return;
+    }
+
     public void gameplayUI () throws Exception {
         while (true) {
             System.out.print("[GAMEPLAY] >>> ");
@@ -334,12 +355,13 @@ public class Main {
                     redrawBoard();
                     break;
                 case "leave":
+                    leave();
                     return;
                 case "make":
                     makeMove(parsed);
                     break;
                 case "resign":
-                    //resign();
+                    resign();
                     break;
                 case "highlight":
                     highlight(parsed);
@@ -382,7 +404,7 @@ public class Main {
         }
     }
 
-    public void preLoginUI () throws Exception{
+    public void preLoginUI () throws Exception {
         System.out.print(SET_TEXT_COLOR_WHITE);
         System.out.println("♕ Welcome to 240 Chess. Type Help to get started. ♕");
         while (true) {

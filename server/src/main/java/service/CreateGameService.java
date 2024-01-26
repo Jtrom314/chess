@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import dataAccess.DataAccess;
 import dataAccess.DataAccessException;
@@ -21,7 +22,11 @@ public class CreateGameService extends SharedService {
             if (auth == null) {
                 throw new ResponseException(401, "unauthorized");
             }
-            GameData game = new GameData(0, null, null, request.gameName(), new ChessGame());
+            ChessGame chessGame = new ChessGame();
+            ChessBoard chessBoard = new ChessBoard();
+            chessBoard.resetBoard();
+            chessGame.setBoard(chessBoard);
+            GameData game = new GameData(0, null, null, request.gameName(), chessGame);
             int gameID = dataAccess.createGame(game);
             return new CreateGameResult(gameID);
         } catch (DataAccessException exception) {
