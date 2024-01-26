@@ -11,6 +11,7 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import server.websocket.methods.JoinManager;
 import server.websocket.methods.MoveManager;
 import server.websocket.methods.ObserveManager;
+import server.websocket.methods.ResignManager;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.UserGameCommand;
 
@@ -21,12 +22,14 @@ public class WebsocketHandler {
     JoinManager joinManager;
     ObserveManager observeManager;
     MoveManager moveManager;
+    ResignManager resignManager;
     public WebsocketHandler(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
         this.connections = new ConnectionManager(dataAccess);
         this.joinManager = new JoinManager(connections);
         this.observeManager = new ObserveManager(connections);
         this.moveManager = new MoveManager(connections);
+        this.resignManager = new ResignManager(connections);
     }
 
     @OnWebSocketMessage
@@ -39,7 +42,7 @@ public class WebsocketHandler {
                 case JOIN_OBSERVER -> observeManager.observe(connection, command);
                 case MAKE_MOVE -> moveManager.move(connection, command);
                 case LEAVE -> leave(connection, command);
-                case RESIGN -> resign(connection, command);
+                case RESIGN -> resignManager.resign(connection, command);
                 default -> throw new Exception();
             }
         } catch (Exception exception) {
