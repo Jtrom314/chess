@@ -12,12 +12,15 @@ public class ConnectionManager {
         this.dataAccess = dataAccess;
     }
 
-    public Connection getConnection(String authToken, Session session) {
+    public Connection getConnection(String authToken, Session session) throws Exception{
         try {
             AuthData auth = dataAccess.getAuthenticationByAuthToken(authToken);
+            if (auth == null) {
+                throw new Exception();
+            }
             return new Connection(authToken, session);
-        } catch (Exception exception) {
-            return null;
+        } catch (NullPointerException exception) {
+            throw new Exception();
         }
     }
 
