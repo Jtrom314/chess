@@ -8,10 +8,7 @@ import org.eclipse.jetty.websocket.api.Session;
 
 
 import org.eclipse.jetty.websocket.api.annotations.*;
-import server.websocket.methods.JoinManager;
-import server.websocket.methods.MoveManager;
-import server.websocket.methods.ObserveManager;
-import server.websocket.methods.ResignManager;
+import server.websocket.methods.*;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.UserGameCommand;
 
@@ -23,6 +20,7 @@ public class WebsocketHandler {
     ObserveManager observeManager;
     MoveManager moveManager;
     ResignManager resignManager;
+    LeaveManager leaveManager;
     public WebsocketHandler(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
         this.connections = new ConnectionManager(dataAccess);
@@ -30,6 +28,7 @@ public class WebsocketHandler {
         this.observeManager = new ObserveManager(connections);
         this.moveManager = new MoveManager(connections);
         this.resignManager = new ResignManager(connections);
+        this.leaveManager = new LeaveManager(connections);
     }
 
     @OnWebSocketMessage
@@ -41,7 +40,7 @@ public class WebsocketHandler {
                 case JOIN_PLAYER -> joinManager.join(connection, command);
                 case JOIN_OBSERVER -> observeManager.observe(connection, command);
                 case MAKE_MOVE -> moveManager.move(connection, command);
-                case LEAVE -> leave(connection, command);
+                case LEAVE -> leaveManager.leave(connection, command);
                 case RESIGN -> resignManager.resign(connection, command);
                 default -> throw new Exception();
             }
@@ -51,8 +50,4 @@ public class WebsocketHandler {
             session.getRemote().sendString(new Gson().toJson(error));
         }
     }
-    public void leave(Connection connection, UserGameCommand command) {}
-
-    public void resign(Connection connection, UserGameCommand command) {}
-
 }

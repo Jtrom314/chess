@@ -2,12 +2,12 @@ package server.websocket;
 
 import webSocketMessages.serverMessages.ServerMessage;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import javax.websocket.Session;
+import java.util.*;
 
 public class GameRoom {
     int gameID;
-    Collection<Connection> allConnections = new ArrayList<>();
+    Collection<Connection> allConnections = new HashSet<>();
     Connection whitePlayer;
     Connection blackPlayer;
 
@@ -22,7 +22,15 @@ public class GameRoom {
     }
 
     public void removeFromALlConnections(Connection connection) {
-        allConnections.remove(connection);
+       for (Connection conn : allConnections) {
+           if (compareConnections(conn, connection)) {
+               allConnections.remove(conn);
+           }
+       }
+    }
+
+    private boolean compareConnections (Connection conn1, Connection conn2) {
+        return conn1.getSession() == conn2.getSession() && conn1.getAuthToken().equals(conn2.getAuthToken());
     }
 
     public void setWhitePlayer(Connection connection) {
@@ -45,4 +53,16 @@ public class GameRoom {
         return this.blackPlayer;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameRoom gameRoom = (GameRoom) o;
+        return gameID == gameRoom.gameID && Objects.equals(allConnections, gameRoom.allConnections) && Objects.equals(whitePlayer, gameRoom.whitePlayer) && Objects.equals(blackPlayer, gameRoom.blackPlayer);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameID, allConnections, whitePlayer, blackPlayer);
+    }
 }
