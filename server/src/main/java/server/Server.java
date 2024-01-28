@@ -1,16 +1,12 @@
 package server;
 
 import dataAccess.DataAccess;
-import dataAccess.MemoryDataAccess;
 import dataAccess.SQLDataAccess;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import server.handlers.ExceptionalHandlers;
 import server.handlers.GameHandlers;
 import server.handlers.UserHandlers;
 import server.websocket.WebsocketHandler;
 import spark.*;
-
-import java.nio.file.Paths;
 
 public class Server {
 

@@ -50,6 +50,9 @@ public class UserGameCommand {
     public void setMove(ChessMove move) {
         this.move = move;
     }
+    public void setCommandType(CommandType command) {
+        this.commandType = command;
+    }
 
     public int getGameID() {
         return this.gameID;

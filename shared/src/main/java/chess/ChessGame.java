@@ -137,9 +137,6 @@ public class ChessGame {
         } else {
             setTeamTurn(TeamColor.WHITE);
         }
-
-        setIsInCheckmate(isInCheckmate(getTeamTurn()));
-        setIsInStalemate(isInStalemate(getTeamTurn()));
     }
 
     /**
@@ -173,9 +170,25 @@ public class ChessGame {
             return false;
         }
 
+
         if (all_valid_moves.isEmpty()) {
             return false;
         }
+
+        Collection<ChessMove> temp = new HashSet<>();
+        for (ChessMove move : all_valid_moves) {
+            ChessPosition move_end_position = move.getEndPosition();
+            if (move_end_position.getRow()== friendly_king_position.getRow()) {
+                temp.add(move);
+            }
+        }
+
+        all_valid_moves = temp;
+
+        if (all_valid_moves.isEmpty()) {
+            return false;
+        }
+
 
         for (ChessMove move : all_valid_moves) {
             ChessPosition move_end_position = move.getEndPosition();
@@ -214,6 +227,7 @@ public class ChessGame {
         }
 
         ChessBoard temp_board = new ChessBoard(current_board);
+        ChessBoard final_board = new ChessBoard(current_board);
         // For each king valid move, move the king to the valid position and check to see if it is still in check
         for (ChessMove king_move : all_valid_king) {
             ChessPosition start_position = king_move.getStartPosition();
@@ -224,13 +238,16 @@ public class ChessGame {
             temp_board.addPiece(end_position, king);
             setBoard(temp_board);
             if (!isInCheck(teamColor)) {
-                setBoard(current_board);
+                temp_board.removePiece(end_position);
+                temp_board.addPiece(start_position, king);
+                setBoard(final_board);
                 return false;
             }
             setBoard(current_board);
             temp_board.removePiece(end_position);
             temp_board.addPiece(start_position, king);
         }
+        setBoard(final_board);
         return true;
     }
     /**
@@ -256,7 +273,12 @@ public class ChessGame {
                 }
             }
         }
+
+        if (all_valid_king.isEmpty()) {
+            return false;
+        }
         ChessBoard temp_board = new ChessBoard(current_board);
+        ChessBoard final_board = new ChessBoard(current_board);
         // For each king valid move, move the king to the valid position and check to see if it is still in check
         for (ChessMove king_move : all_valid_king) {
             ChessPosition start_position = king_move.getStartPosition();
@@ -267,14 +289,16 @@ public class ChessGame {
             temp_board.addPiece(end_position, king);
             setBoard(temp_board);
             if (!isInCheck(teamColor)) {
-                setBoard(current_board);
+                temp_board.removePiece(end_position);
+                temp_board.addPiece(start_position, king);
+                setBoard(final_board);
                 return false;
             }
             setBoard(current_board);
             temp_board.removePiece(end_position);
             temp_board.addPiece(start_position, king);
         }
-
+        setBoard(final_board);
         return !isInCheck(teamColor);
     }
 

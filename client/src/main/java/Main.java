@@ -1,15 +1,13 @@
 import chess.*;
 import facade.ServerFacade;
-import facade.WebsocketFacade;
 import model.GameData;
 import result.CreateGameResult;
 import result.ListGameResult;
 import result.LoginResult;
 import ui.BoardUI;
 import ui.BoardUI.STATE;
+import webSocketMessages.userCommands.UserGameCommand;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -17,16 +15,15 @@ import static ui.EscapeSequences.*;
 public class Main {
     public String username;
     public String authToken;
-    public int currentGameID;
-    ChessGame.TeamColor currentTeamColor;
+    public int gameID;
     GameData[] gameList;
-    ChessGame currentGame;
     WebsocketFacade ws;
     BoardUI boardUI = new BoardUI();
+    SharedData sharedData = new SharedData();
 
 
     public Main () throws Exception{
-        this.ws = new WebsocketFacade();
+        this.ws = new WebsocketFacade(sharedData);
     }
 
 
@@ -139,19 +136,17 @@ public class Main {
         ServerFacade serverFacade = new ServerFacade();
         try {
             serverFacade.joinGame(getAuthToken(), gameID, request[2]);
-            setCurrentGameID(gameID);
-            ChessGame game = new ChessGame();
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            game.setBoard(board);
+            System.out.println(gameID);
+            setGameID(gameID);
+            System.out.println(getGameID());
+            sharedData.setCurrentTeamColor(request[2]);
 
-            boardUI.printBlackPerspective(game, false, null, null);
-            System.out.print("\n");
-            boardUI.printWhitePerspective(game, false, null, null);
-            setCurrentTeamColor(request[2]);
+            UserGameCommand command = new UserGameCommand(getAuthToken());
+            command.setCommandType(UserGameCommand.CommandType.JOIN_PLAYER);
+            command.setGameID(getGameID());
+            command.setPlayerColor(sharedData.getCurrentTeamColor());
 
-            setCurrentGame(game);
-
+            ws.send(command);
             gameplayUI();
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
@@ -164,21 +159,27 @@ public class Main {
             return;
         }
 
+        int gameID;
+        try {
+            int gameIndex = Integer.parseInt(request[1]);
+            GameData game = gameList[gameIndex -1];
+            gameID = game.gameID();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
         ServerFacade serverFacade = new ServerFacade();
         try {
-            serverFacade.observeGame(getAuthToken(), Integer.parseInt(request[1]));
-            setCurrentGameID(Integer.parseInt(request[1]));
-            ChessGame game = new ChessGame();
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            game.setBoard(board);
+            serverFacade.observeGame(getAuthToken(), gameID);
+            setGameID(gameID);
+            sharedData.setCurrentTeamColor(" ");
 
-            boardUI.printBlackPerspective(game, false, null, null);
-            System.out.print("\n");
-            boardUI.printWhitePerspective(game, false, null, null);
-            setCurrentTeamColor(null);
+            UserGameCommand command = new UserGameCommand(getAuthToken());
+            command.setCommandType(UserGameCommand.CommandType.JOIN_OBSERVER);
+            command.setGameID(getGameID());
 
-            setCurrentGame(game);
+            ws.send(command);
 
             gameplayUI();
         } catch (Exception exception) {
@@ -186,15 +187,8 @@ public class Main {
         }
     }
 
-    public void redrawBoard () {
-        if (currentTeamColor == ChessGame.TeamColor.BLACK) {
-            boardUI.printBlackPerspective(getCurrentGame(), false, null, null);
-        } else {
-            boardUI.printWhitePerspective(getCurrentGame(), false, null, null);
-        }
-    }
 
-    public void makeMove(String[] parsed) {
+    public void makeMove(String[] parsed) throws Exception {
         String userMove = parsed[2];
         userMove = userMove.toLowerCase();
 
@@ -205,9 +199,6 @@ public class Main {
 
         String startingPostitionString = userMove.substring(0, 2);
         String endingPostitionString = userMove.substring(2, 4);
-
-        System.out.printf("SPS: %s\n", startingPostitionString);
-        System.out.printf("EPS: %s\n", endingPostitionString);
 
         ChessPosition startingPosition;
         ChessPosition endingPosition;
@@ -242,6 +233,11 @@ public class Main {
         }
 
         ChessMove move = new ChessMove(startingPosition, endingPosition, promotion);
+        UserGameCommand command = new UserGameCommand(getAuthToken());
+        command.setCommandType(UserGameCommand.CommandType.MAKE_MOVE);
+        command.setGameID(getGameID());
+        command.setMove(move);
+        ws.send(command);
     }
 
     public ChessPosition getPositionByString(String stringPosition) throws Exception {
@@ -304,22 +300,10 @@ public class Main {
             return;
         }
 
-        ChessGame currentGame = getCurrentGame();
-        Collection<ChessMove> validMoves = currentGame.validMoves(startingPosition);
-
-        if (validMoves == null) {
-            validMoves = new HashSet<>();
-
-        }
-
-        if (getCurrentTeamColor() == ChessGame.TeamColor.BLACK) {
-            boardUI.printBlackPerspective(getCurrentGame(), true, startingPosition, validMoves);
-        } else {
-            boardUI.printWhitePerspective(getCurrentGame(), true, startingPosition, validMoves);
-        }
+        sharedData.highlightBoard(startingPosition);
     }
 
-    public void resign() {
+    public void resign() throws Exception{
         while (true) {
             System.out.println("[DO YOU REALLY WANT TO RESIGN? (Y/N)] >>> ");
             Scanner scanner = new Scanner(System.in);
@@ -327,6 +311,10 @@ public class Main {
             switch (word) {
                 case "Y":
                 case "y":
+                    UserGameCommand command = new UserGameCommand(getAuthToken());
+                    command.setCommandType(UserGameCommand.CommandType.RESIGN);
+                    command.setGameID(getGameID());
+                    ws.send(command);
                     return;
                 case "N":
                 case "n":
@@ -336,8 +324,11 @@ public class Main {
         }
     }
 
-    public void leave() {
-        return;
+    public void leave() throws Exception{
+        UserGameCommand command = new UserGameCommand(getAuthToken());
+        command.setCommandType(UserGameCommand.CommandType.LEAVE);
+        command.setGameID(getGameID());
+        ws.send(command);
     }
 
     public void gameplayUI () throws Exception {
@@ -352,7 +343,7 @@ public class Main {
                     boardUI.printHelp(STATE.GAMEPLAY);
                     break;
                 case "redraw":
-                    redrawBoard();
+                    sharedData.redrawBoard();
                     break;
                 case "leave":
                     leave();
@@ -445,24 +436,8 @@ public class Main {
         this.authToken = authToken;
     }
 
-    public void setCurrentGameID(int gameID) {
-        this.currentGameID = gameID;
-    }
-    public void setCurrentTeamColor(String color) {
-        switch (color) {
-            case "WHITE":
-                this.currentTeamColor = ChessGame.TeamColor.WHITE;
-                break;
-            case "BLACK":
-                this.currentTeamColor = ChessGame.TeamColor.BLACK;
-                break;
-            default:
-                this.currentTeamColor = null;
-        }
-    }
-
-    public void setCurrentGame(ChessGame game) {
-        this.currentGame = game;
+    public void setGameID(int gameID) {
+        this.gameID = gameID;
     }
 
     public String getUsername() {
@@ -473,15 +448,7 @@ public class Main {
         return this.authToken;
     }
 
-    public int getCurrentGameID() {
-        return this.currentGameID;
-    }
-
-    public ChessGame.TeamColor getCurrentTeamColor() {
-        return this.currentTeamColor;
-    }
-
-    public ChessGame getCurrentGame () {
-        return this.currentGame;
+    public int getGameID() {
+        return gameID;
     }
 }

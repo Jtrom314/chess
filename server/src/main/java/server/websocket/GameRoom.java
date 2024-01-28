@@ -1,8 +1,5 @@
 package server.websocket;
 
-import webSocketMessages.serverMessages.ServerMessage;
-
-import javax.websocket.Session;
 import java.util.*;
 
 public class GameRoom {
